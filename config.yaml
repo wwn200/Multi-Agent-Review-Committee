@@ -1,0 +1,25 @@
+llm:
+  provider: openai
+  default_model: gpt-5.6-luna
+  temperature: 0.2
+
+agents:
+  product:
+    model: gpt-5.6-luna
+    role: product_manager
+
+  technical:
+    model: gpt-5.6-terra
+    role: technical_expert
+
+  risk:
+    model: gpt-5.6-terra
+    role: risk_manager
+
+  manager:
+    model: gpt-5.6-sol
+    role: decision_maker
+
+evaluation:
+  max_rounds: 2
+  require_structured_output: true
