@@ -3,9 +3,7 @@ from llm.client import LLMClient
 
 def main():
 
-    llm = LLMClient(
-        model="gpt-5.6-luna"
-    )
+    llm = LLMClient()
 
     # response = llm.generate(
     #     system_prompt="""
