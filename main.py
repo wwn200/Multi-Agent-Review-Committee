@@ -73,6 +73,8 @@ def main():
         print(loader.load(args.file))
 
     if args.command == "evaluate-model":
+
+        # Here will be included in workflow in the future.
     
         importer = AssumptionImporter()
     
