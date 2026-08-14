@@ -1,29 +1,61 @@
-from llm.client import LLMClient
+import argparse
+
+from src.evaluation.rubric_importer import RubricImporter
+from src.evaluation.rubric_loader import RubricLoader
 
 
 def main():
-
-    llm = LLMClient()
-
-    # response = llm.generate(
-    #     system_prompt="""
-    #     You are a technical project reviewer.
-    #     Evaluate the technical feasibility of a project proposal.
-    #     """,
-    #     user_prompt="""
-    #     A company proposes an autonomous delivery robot
-    #     for university campuses.
-
-    #     Evaluate its technical feasibility.
-    #     """,
-    # )
-
-    response = llm.generate(
-        system_prompt="You are a helpful assistant.",
-        user_prompt="Say something you want (around 100 words)."
+    parser = argparse.ArgumentParser(
+        description="Evaluation Agent"
     )
 
-    print(response)
+    subparsers = parser.add_subparsers(
+        dest="command",
+        required=True,
+    )
+
+    # --------------------------------------------------
+    # import-rubric command
+    # --------------------------------------------------
+
+    import_parser = subparsers.add_parser(
+        "import-rubric",
+        help="Import an evaluation rubric from an XLSX file.",
+    )
+
+    import_parser.add_argument(
+        "file",
+        help="Path to the XLSX rubric file.",
+    )
+
+    # --------------------------------------------------
+    # Parse arguments
+    # --------------------------------------------------
+
+    args = parser.parse_args()
+
+    # --------------------------------------------------
+    # Execute command
+    # --------------------------------------------------
+
+    if args.command == "import-rubric":
+
+        importer = RubricImporter()
+
+        output_path = importer.import_rubric(
+            args.file
+        )
+
+        print(
+            f"Rubric imported to: {output_path}"
+        )
+
+        loader = RubricLoader()
+
+        print(loader.list_rubrics())
+
+        print(loader.load(args.file))
+
 
 
 if __name__ == "__main__":

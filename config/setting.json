@@ -2,4 +2,9 @@
     "llm": {
         "model": "gpt-5.6-luna"
     }
+    {
+    "paths": {
+        "evaluation_rubric": "data/evaluation_rubric"
+    }
+}
 }
