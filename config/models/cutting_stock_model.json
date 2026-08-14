@@ -1,0 +1,84 @@
+{
+    "assumption_set_name": "cutting_stock_model",
+    "version": "1.0",
+    "assumptions": [
+        {
+            "id": "S1",
+            "classification": "Operating Conditions",
+            "name": "Production Time Insensitivity",
+            "description": "Products are assumed to have flexible delivery requirements, allowing products from the original cutting plan to be returned to the order pool and rescheduled in subsequent production batches during the replanning process. In reality, some products may be associated with urgent delivery deadlines and therefore cannot be postponed or returned to the order pool, limiting the flexibility of cutting plan adjustments."
+        },
+        {
+            "id": "S2",
+            "classification": "Operating Conditions",
+            "name": "Simplified Production Line",
+            "description": "The system is assumed to involve a single or simplified production line; in reality, multiple heterogeneous production lines may exist simultaneously."
+        },
+        {
+            "id": "S3",
+            "classification": "System Behavior",
+            "name": "Sufficiently Large Order Pool",
+            "description": "The order pool is assumed to be sufficiently large and fully available for replanning, allowing product demands to be freely reassigned during the cutting adjustment process. In reality, the set of orders available for replanning may be restricted by practical considerations such as production site requirements, customer-specific constraints, or other operational limitations, resulting in a more limited and less flexible order pool."
+        },
+        {
+            "id": "S4",
+            "classification": "System Behavior",
+            "name": "Deterministic Defect Value Representation",
+            "description": "Product values and regional value ratios are assumed to be deterministic and predefined. In reality, these parameters may vary across products. For example, the same defect may have different impacts on different product types, implying that the corresponding value ratio may not be uniform across all products."
+        },
+        {
+            "id": "S5",
+            "classification": "System Behavior",
+            "name": "Guillotine Cutting Constraint",
+            "description": "Cutting operations are assumed to follow guillotine-cutting rules with sequential straight-line cuts; in reality, more flexible cutting patterns may be feasible."
+        },
+        {
+            "id": "S6",
+            "classification": "Data and Observation",
+            "name": "Known Defect Distribution",
+            "description": "Defect locations are assumed to be known and fixed after inspection; in reality, defect information may contain uncertainty and observation errors."
+        },
+        {
+            "id": "S7",
+            "classification": "Causal / Mechanistic Understanding",
+            "name": "Value Judgment Mechanism",
+            "description": "Product value is assumed to be determined solely by the most severe defect contained within the product. In reality, multiple defects may jointly influence product value and lead to additional downgrading effects."
+        },
+        {
+            "id": "S8",
+            "classification": "Causal / Mechanistic Understanding",
+            "name": "Simplified Cutting Process Mechanism",
+            "description": "Cutting operations are assumed to follow simplified operational rules and to be directly executable according to the generated cutting plan. In reality, cutting processes may be influenced by additional operational and mechanical constraints, such as machine configurations, cutting shaft arrangements, setup adjustments, scrap removal requirements, and other production-related limitations."
+        },
+        {
+            "id": "M1",
+            "classification": "Resolution and Aggregation",
+            "name": "Rectangular Defect Representation",
+            "description": "Defects are assumed to be representable as rectangular regions; in reality, defect shapes are often irregular and geometrically complex."
+        },
+        {
+            "id": "M2",
+            "classification": "Resolution and Aggregation",
+            "name": "Decision Independence",
+            "description": "Width-direction cutting decisions are assumed to be independent of length-wise sequencing decisions; in reality, these decisions may be operationally interdependent. For example, switching between different cutting patterns may require repositioning cutting tools and therefore influence production efficiency."
+        },
+        {
+            "id": "M3",
+            "classification": "Parameterization",
+            "name": "Fixed Penalty Coefficient",
+            "description": "The penalty associated with each scrap segment is assumed to be fixed and known. In reality, the cost of scrap generation may vary depending on factors such as processing requirements, machine utilization, production schedules, and operational priorities."
+        },
+        {
+            "id": "C1",
+            "classification": "Decomposition and Relaxation",
+            "name": "Master--Subproblem Decomposition",
+            "description": "The two-dimensional cutting problem is assumed to be decomposable into coordinated subproblems; in reality, interactions among subproblems may be more tightly coupled."
+        },
+        {
+            "id": "C2",
+            "classification": "Scalability and Tractability",
+            "name": "Restricted Search Space",
+            "description": "The optimization model is assumed to search within a reduced set of feasible cutting patterns to ensure tractable computation; in reality, potentially valuable cutting configurations may exist outside the explored solution space."
+        }
+    ]
+}

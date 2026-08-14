@@ -2,6 +2,8 @@ import argparse
 
 from src.evaluation.rubric_importer import RubricImporter
 from src.evaluation.rubric_loader import RubricLoader
+from src.evaluation.assumption_importer import AssumptionImporter
+from src.evaluation.assumption_loader import AssumptionLoader
 
 
 def main():
@@ -26,6 +28,20 @@ def main():
     import_parser.add_argument(
         "file",
         help="Path to the XLSX rubric file.",
+    )
+
+    # --------------------------------------------------
+    # evaluate-model command
+    # --------------------------------------------------
+
+    evaluate_parser = subparsers.add_parser(
+        "evaluate-model",
+        help="Evaluate a model.",
+    )
+
+    evaluate_parser.add_argument(
+        "model_name",
+        help="Name of the model to evaluate.",
     )
 
     # --------------------------------------------------
@@ -55,6 +71,26 @@ def main():
         print(loader.list_rubrics())
 
         print(loader.load(args.file))
+
+    if args.command == "evaluate-model":
+    
+        importer = AssumptionImporter()
+    
+        output_path = importer.import_assumption(
+            args.model_name
+        )
+    
+        print(
+            f"Rubric imported to: {output_path}"
+        )
+    
+        loader = AssumptionLoader()
+    
+        print(loader.list_assumptions())
+    
+        print(loader.load(args.model_name))
+    
+
 
 
 
