@@ -65,6 +65,12 @@ Clearly distinguish your judgment from factual information
 provided in the evaluation context.
 """
 
+EVALUATION_TASK_TEMPLATE = """\
+## Evaluation Task
+
+{task}
+"""
+
 
 EVALUATOR_SYSTEM_PROMPT_TEMPLATE = """\
 {identity}

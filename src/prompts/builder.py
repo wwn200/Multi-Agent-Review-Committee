@@ -58,6 +58,71 @@ class PromptBuilder:
 
         return self._assemble_prompt(sections)
 
+    def build_system_prompt(
+        self,
+        profile: EvaluatorProfile,
+        rubric: str,
+    ) -> str:
+        """
+        Build the system prompt for an evaluator.
+
+        The system prompt defines who the evaluator is,
+        how the evaluator tends to reason, and which
+        evaluation rubric should be followed.
+        """
+
+        sections = self._build_system_sections(
+            profile=profile,
+            rubric=rubric,
+        )
+
+        sections.sort(
+            key=lambda section: section.order
+        )
+
+        return self._assemble_system_prompt(
+            sections
+        )
+
+    def build_user_prompt(
+        self,
+        context: str,
+        task: str,
+    ) -> str:
+        """
+        Build the user prompt for a specific evaluation task.
+
+        The user prompt contains the current evaluation
+        context, assumption, and task.
+        """
+
+        return CONTEXT_TEMPLATE.format(
+            context=context
+        ) + "\n\n" + (
+            "## Evaluation Task\n\n"
+            f"{task}"
+        )
+
+    def _build_system_sections(
+        self,
+        profile: EvaluatorProfile,
+        rubric: str,
+    ) -> list[PromptSection]:
+        """
+        Build all sections that belong to the system prompt.
+        """
+
+        return [
+            self._build_identity_section(profile),
+            self._build_background_section(profile),
+            self._build_expertise_section(profile),
+            self._build_perspective_section(profile),
+            self._build_behavior_section(profile),
+            self._build_concerns_section(profile),
+            self._build_rubric_section(rubric),
+            self._build_output_requirements_section(),
+        ]
+
     def _build_sections(
         self,
         profile: EvaluatorProfile,
@@ -285,6 +350,19 @@ class PromptBuilder:
             output_requirements=section_map[
                 "Output Requirements"
             ],
+        ).strip()
+
+    @staticmethod
+    def _assemble_system_prompt(
+        sections: list[PromptSection],
+    ) -> str:
+        """
+        Assemble system prompt sections in order.
+        """
+
+        return "\n\n".join(
+            section.content
+            for section in sections
         ).strip()
 
     @staticmethod
