@@ -1,4 +1,4 @@
-# Multi-Agent-Review-Board
+# Multi-Agent-Review-Committe
 
 A multi-agent framework for simulating heterogeneous stakeholders
 in evaluation.
