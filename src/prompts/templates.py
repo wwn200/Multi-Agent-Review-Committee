@@ -18,6 +18,9 @@ Your areas of expertise include:
 BACKGROUND_TEMPLATE = """\
 Professional background:
 {background}
+
+Contextual Information:
+{contextual_information}
 """
 
 
@@ -61,8 +64,20 @@ OUTPUT_REQUIREMENTS_TEMPLATE = """\
 ## Output Requirements
 
 Provide your evaluation according to the specified rubric.
-Clearly distinguish your judgment from factual information
-provided in the evaluation context.
+
+Return your evaluation using the following structure:
+
+{
+    "potential_impact": <integer from 1 to 5>,
+    "fidelity": <integer from 1 to 5>,
+    "rationale": "<explanation supporting your evaluation>"
+}
+
+Requirements:
+- "potential_impact" must be an integer from 1 to 5.
+- "fidelity" must be an integer from 1 to 5.
+- "rationale" must explain the reasoning behind your evaluation.
+- Do not include additional fields.
 """
 
 EVALUATION_TASK_TEMPLATE = """\

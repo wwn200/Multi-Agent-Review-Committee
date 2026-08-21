@@ -3,9 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from agents.profile.schema import EvaluatorProfile
-from llm.client import LLMClient
-from prompts.builder import PromptBuilder
+from ..llm.client import LLMClient
+from ..prompts.builder import PromptBuilder
+from .profile.schema import EvaluatorProfile
 
 
 @dataclass
@@ -72,7 +72,6 @@ class EvaluatorAgent:
         self,
         rubric: str,
         context: str,
-        assumption: str,
         task: str,
     ) -> EvaluationResult:
         """
@@ -90,7 +89,6 @@ class EvaluatorAgent:
         user_prompt = (
             self.prompt_builder.build_user_prompt(
                 context=context,
-                assumption=assumption,
                 task=task,
             )
         )

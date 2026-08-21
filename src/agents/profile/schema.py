@@ -30,6 +30,14 @@ class DistributionSpec:
     beta: float | None = None
 
     def __post_init__(self) -> None:
+        if self.distribution is None:
+            raise ValueError("Distribution type is required.")
+
+        if self.distribution not in DistributionType:
+            raise ValueError(
+                f"Unsupported distribution type: {self.distribution}"
+            )
+
         if self.distribution == "normal":
             if self.mean is None or self.std is None:
                 raise ValueError(
@@ -114,18 +122,18 @@ class RoleSpec:
     name: str
     description: str = ""
 
-    expertise: dict[str, str] = field(default_committe=dict)
+    expertise: dict[str, str] = field(default_factory=dict)
 
     base_traits: dict[str, TraitSpec] = field(
-        default_committe=dict
+        default_factory=dict
     )
 
     default_attention_weights: dict[str, float] = field(
-        default_committe=dict
+        default_factory=dict
     )
 
     default_concerns: list[str] = field(
-        default_committe=list
+        default_factory=list
     )
 
     evidence_preference: str | None = None
@@ -145,19 +153,19 @@ class BackgroundSpec:
     description: str = ""
 
     traits: dict[str, TraitModifier] = field(
-        default_committe=dict
+        default_factory=dict
     )
 
     attention_weights: dict[str, float] = field(
-        default_committe=dict
+        default_factory=dict
     )
 
     concerns: list[str] = field(
-        default_committe=list
+        default_factory=list
     )
 
     contextual_information: dict[str, Any] = field(
-        default_committe=dict
+        default_factory=dict
     )
 
 
@@ -177,15 +185,15 @@ class EvaluatorPopulationSpec:
     background: BackgroundSpec | None = None
 
     traits: dict[str, TraitSpec] = field(
-        default_committe=dict
+        default_factory=dict
     )
 
     attention_weights: dict[str, float] = field(
-        default_committe=dict
+        default_factory=dict
     )
 
     concerns: list[str] = field(
-        default_committe=list
+        default_factory=list
     )
 
     evidence_preference: str | None = None
@@ -212,21 +220,21 @@ class EvaluatorProfile:
     background: str | None = None
 
     traits: dict[str, float] = field(
-        default_committe=dict
+        default_factory=dict
     )
 
     attention_weights: dict[str, float] = field(
-        default_committe=dict
+        default_factory=dict
     )
 
     concerns: list[str] = field(
-        default_committe=list
+        default_factory=list
     )
 
     evidence_preference: str | None = None
 
     contextual_information: dict[str, Any] = field(
-        default_committe=dict
+        default_factory=dict
     )
 
     seed: int | None = None

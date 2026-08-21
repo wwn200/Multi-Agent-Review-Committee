@@ -2,16 +2,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from llm.client import LLMClient
-from prompts.builder import PromptBuilder
-
+from ..llm.client import LLMClient
+from ..prompts.builder import PromptBuilder
 from .evaluator import EvaluatorAgent
 from .profile.loader import ProfileConfigLoader
 from .profile.modifiers import ProfileModifier
 from .profile.sampler import EvaluatorSampler
 
 
-class EvaluatorAgentCommitte:
+class EvaluatorAgentCommittee:
     """
     Committe for creating evaluator agents.
 

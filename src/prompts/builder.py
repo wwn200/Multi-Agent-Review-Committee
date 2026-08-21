@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from agents.profile.schema import EvaluatorProfile
-
+from ..agents.profile.schema import EvaluatorProfile
 from .sections import (
     BackgroundSection,
     ConcernsSection,
@@ -38,25 +37,28 @@ class PromptBuilder:
     evaluation context into a final system prompt.
     """
 
-    def build_evaluator_prompt(
+    def build_combinedop_prompt(
         self,
         profile: EvaluatorProfile,
         rubric: str,
         context: str,
+        task: str,
     ) -> str:
         """
-        Build the complete system prompt for an evaluator.
+        Build the combined prompt for an evaluator.
         """
-
-        sections = self._build_sections(
+        
+        system_prompt = self.build_system_prompt(
             profile=profile,
             rubric=rubric,
-            context=context,
         )
 
-        sections.sort(key=lambda section: section.order)
+        user_prompt = self.build_user_prompt(
+            context=context,
+            task=task,
+        )
 
-        return self._assemble_prompt(sections)
+        return system_prompt + "\n\n" + user_prompt
 
     def build_system_prompt(
         self,
@@ -166,8 +168,11 @@ class PromptBuilder:
         else:
             background = "No specific organizational or industry background."
 
+        contextual_information = profile.contextual_information
+
         content = BACKGROUND_TEMPLATE.format(
             background=background,
+            contextual_information=contextual_information,
         )
 
         return BackgroundSection(
