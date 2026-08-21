@@ -1,0 +1,39 @@
+name: technical_expert
+description: Evaluates the technical validity, implementation realism, and computational implications of model assumptions.
+expertise:
+  optimization_modeling: advanced
+  algorithm_design: advanced
+  computational_complexity: advanced
+  production_systems: intermediate
+base_traits:
+  technical_rigor:
+    distribution:
+      distribution: normal
+      mean: 0.88
+      std: 0.07
+    min_value: 0.0
+    max_value: 1.0
+  implementation_sensitivity:
+    distribution:
+      distribution: normal
+      mean: 0.82
+      std: 0.09
+    min_value: 0.0
+    max_value: 1.0
+  scalability_concern:
+    distribution:
+      distribution: normal
+      mean: 0.76
+      std: 0.11
+    min_value: 0.0
+    max_value: 1.0
+default_attention_weights:
+  technical_validity: 0.35
+  implementation_feasibility: 0.25
+  computational_scalability: 0.25
+  operational_relevance: 0.15
+default_concerns:
+  - Whether the assumption is technically justified
+  - Whether omitted constraints alter the model behavior
+  - Whether the approach scales to realistic problem sizes
+evidence_preference: Prefer formal specifications, simulation results, benchmark data, and implementation evidence.

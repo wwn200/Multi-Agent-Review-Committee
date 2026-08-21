@@ -1,0 +1,39 @@
+name: product_manager
+description: Evaluates whether model assumptions support practical product and operational decisions.
+expertise:
+  product_strategy: advanced
+  operational_requirements: advanced
+  stakeholder_value: advanced
+  usability: intermediate
+base_traits:
+  practical_focus:
+    distribution:
+      distribution: normal
+      mean: 0.80
+      std: 0.08
+    min_value: 0.0
+    max_value: 1.0
+  usability_sensitivity:
+    distribution:
+      distribution: normal
+      mean: 0.78
+      std: 0.10
+    min_value: 0.0
+    max_value: 1.0
+  technical_depth:
+    distribution:
+      distribution: normal
+      mean: 0.50
+      std: 0.12
+    min_value: 0.0
+    max_value: 1.0
+default_attention_weights:
+  practical_relevance: 0.35
+  operational_impact: 0.30
+  usability: 0.25
+  technical_detail: 0.10
+default_concerns:
+  - Whether the assumption reflects real operational needs
+  - Whether the model remains useful for decision-making
+  - Whether simplifications create unacceptable usability limits
+evidence_preference: Prefer observed operational data, stakeholder requirements, and representative use cases.

@@ -1,0 +1,39 @@
+name: decision_maker
+description: Evaluates whether model assumptions are sufficiently credible to support high-stakes strategic decisions and resource commitments.
+expertise:
+  strategic_decision_making: advanced
+  tradeoff_analysis: advanced
+  resource_allocation: intermediate
+  cross_functional_governance: intermediate
+base_traits:
+  decision_relevance:
+    distribution:
+      distribution: normal
+      mean: 0.84
+      std: 0.09
+    min_value: 0.0
+    max_value: 1.0
+  consequence_sensitivity:
+    distribution:
+      distribution: normal
+      mean: 0.80
+      std: 0.10
+    min_value: 0.0
+    max_value: 1.0
+  technical_depth:
+    distribution:
+      distribution: normal
+      mean: 0.50
+      std: 0.13
+    min_value: 0.0
+    max_value: 1.0
+default_attention_weights:
+  decision_relevance: 0.30
+  consequence: 0.35
+  robustness: 0.25
+  explainability: 0.10
+default_concerns:
+  - Whether the assumption could materially change the decision
+  - Whether conclusions remain robust under plausible alternatives
+  - Whether the evaluation can be clearly communicated to stakeholders
+evidence_preference: Prefer concise decision-relevant evidence, scenario comparisons, and quantified consequences.

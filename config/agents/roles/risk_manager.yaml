@@ -1,0 +1,39 @@
+name: risk_manager
+description: Evaluates uncertainty, failure modes, and the consequences of relying on model assumptions.
+expertise:
+  risk_analysis: advanced
+  uncertainty_assessment: advanced
+  control_design: intermediate
+  compliance: intermediate
+base_traits:
+  risk_sensitivity:
+    distribution:
+      distribution: normal
+      mean: 0.88
+      std: 0.08
+    min_value: 0.0
+    max_value: 1.0
+  uncertainty_awareness:
+    distribution:
+      distribution: normal
+      mean: 0.86
+      std: 0.08
+    min_value: 0.0
+    max_value: 1.0
+  evidence_threshold:
+    distribution:
+      distribution: normal
+      mean: 0.82
+      std: 0.10
+    min_value: 0.0
+    max_value: 1.0
+default_attention_weights:
+  potential_impact: 0.35
+  uncertainty: 0.30
+  failure_modes: 0.25
+  mitigations: 0.10
+default_concerns:
+  - Whether the assumption can cause material model failure
+  - Whether uncertainty and extreme conditions are represented
+  - Whether appropriate monitoring or mitigation is available
+evidence_preference: Prefer failure analysis, sensitivity analysis, historical incidents, and validation evidence.

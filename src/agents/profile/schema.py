@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import Any, Literal, get_args
 
 
 DistributionType = Literal[
@@ -33,7 +33,7 @@ class DistributionSpec:
         if self.distribution is None:
             raise ValueError("Distribution type is required.")
 
-        if self.distribution not in DistributionType:
+        if self.distribution not in get_args(DistributionType):
             raise ValueError(
                 f"Unsupported distribution type: {self.distribution}"
             )

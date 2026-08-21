@@ -1,0 +1,52 @@
+name: manufacturing
+
+description: >
+  Professional background in manufacturing environments, where evaluators
+  are shaped by practical production requirements, operational constraints,
+  implementation risks, and the consequences of model-based decisions.
+
+traits:
+  practical_focus:
+    mean_shift: 0.05
+    std_multiplier: 0.95
+
+  implementation_sensitivity:
+    mean_shift: 0.05
+    std_multiplier: 0.95
+
+  risk_sensitivity:
+    mean_shift: 0.05
+    std_multiplier: 1.0
+
+  scalability_concern:
+    mean_shift: 0.05
+    std_multiplier: 1.0
+
+  consequence_sensitivity:
+    mean_shift: 0.03
+    std_multiplier: 1.0
+
+attention_weights:
+  production_feasibility: 0.15
+  resource_constraints: 0.15
+
+concerns:
+  - Whether assumptions reflect actual production constraints
+  - Whether the model remains reliable under production variability and disruptions
+  - Whether model recommendations can be implemented without disrupting operations
+  - Whether the proposed approach scales to realistic production volumes and requirements
+
+contextual_information:
+  industry: manufacturing
+  typical_applications:
+    - production planning
+    - scheduling
+    - process optimization
+    - cutting and material utilization
+  relevant_constraints:
+    - machine capacity
+    - production schedules
+    - material availability
+    - material waste
+    - delivery requirements
+    - operational disruptions
