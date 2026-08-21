@@ -5,6 +5,10 @@ import pytest
 from src.agents.committee import EvaluatorAgentCommittee
 from src.llm.client import LLMClient
 
+from src.evaluation.rubric_loader import RubricLoader
+from src.evaluation.rubric_validator import RubricValidator
+from src.evaluation.rubric_prompt import build_rubric_prompt
+
 
 @pytest.mark.api
 def test_manufacturing_product_manager_evaluation():
@@ -69,19 +73,16 @@ def test_manufacturing_product_manager_evaluation():
                 evaluator_id="risk_manager_001",
             )
 
-    rubric = """
-Evaluate the model assumption using the following criteria.
+    # Load rubric
+    rubric_loader = RubricLoader()
+    rubric = rubric_loader.load("test_rubric")
 
-Potential Impact:
-How important is this assumption to the validity and usefulness
-of the model? A score of 1 indicates very low impact, while a
-score of 5 indicates very high impact.
+    # Validate rubric
+    rubric_validator = RubricValidator()
+    rubric_validator.validate(rubric)
 
-Fidelity:
-How realistically does this assumption represent the real-world
-manufacturing system? A score of 1 indicates very low fidelity,
-while a score of 5 indicates very high fidelity.
-"""
+    # Build rubric prompt
+    rubric_prompt = build_rubric_prompt(rubric)
 
     context = """
 The model represents a manufacturing production planning system.
@@ -101,29 +102,31 @@ scheduling decisions in a manufacturing environment.
     task = """
 Evaluate the following model assumption:
 
-"The customer order demand remains stable over the planning horizon."
+"The equipment failure rate remains stable over the planning horizon."
 
 Assess both the potential impact and fidelity of this assumption.
 Consider the assumption from the perspective of a product manager
 working in a manufacturing environment.
 
+Provide the scores for Potential Impact and Fidelity, as well as the scores for their respective attributes.
+
 Provide a concise rationale explaining your scores.
 """
 
     result_pm = agent_pm.evaluate(
-        rubric=rubric,
+        rubric=rubric_prompt,
         context=context,
         task=task,
     )
 
     result_dm = agent_dm.evaluate(
-            rubric=rubric,
+            rubric=rubric_prompt,
             context=context,
             task=task,
         )
 
     result_rm = agent_rm.evaluate(
-            rubric=rubric,
+            rubric=rubric_prompt,
             context=context,
             task=task,
         )

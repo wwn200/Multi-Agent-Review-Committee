@@ -98,3 +98,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+#python main.py import-rubric test_rubric   
+#python main.py evaluate-model cutting_stock_model  

@@ -6,7 +6,9 @@
         "max": 5
     },
     "general_guidance": [
-        "a Likert-scale approach is preferred due to its simplicity and ease of interpretation."
+        "a Likert-scale approach is preferred due to its simplicity and ease of interpretation.",
+        "The evaluator assigns a score from 1 to 5 based on the descriptions of each attribute and the rubric.",
+        "The scores for the two types, Potential Impact and Fidelity, are calculated based on the scores of their respective attributes. The weight assigned to each attribute is determined by the evaluator based on their own concerns and attention."
     ],
     "criteria": [
         {
