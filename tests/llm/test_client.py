@@ -1,6 +1,9 @@
+import pytest
+
 from src.llm.client import LLMClient
 
 
+@pytest.mark.api
 def test_llm_generate():
     llm = LLMClient()
 
@@ -12,4 +15,3 @@ def test_llm_generate():
     assert response is not None
     assert isinstance(response, str)
     assert len(response) > 0
-    
