@@ -1,6 +1,9 @@
 {
     "assumption_set_name": "cutting_stock_model",
     "version": "1.0",
+    "context": [
+        "The model represents a manufacturing production planning system. It is used to determine production schedules and allocate products to production lines. The purpose of the model is to support production planning and scheduling decisions in a manufacturing environment."
+    ],
     "assumptions": [
         {
             "id": "S1",

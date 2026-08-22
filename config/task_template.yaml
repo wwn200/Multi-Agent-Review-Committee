@@ -1,0 +1,11 @@
+template: |
+  Evaluate the following model assumption:
+
+  {evaluation_target}
+
+  Assess both the potential impact and fidelity of this assumption.
+  Consider the assumption from the perspective of your role, knowledge and background.
+
+  Provide the scores for Potential Impact and Fidelity, as well as the scores for their respective attributes.
+
+  Provide a concise rationale explaining your scores.

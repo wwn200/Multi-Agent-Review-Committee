@@ -1,0 +1,14 @@
+committee_name: test_committee
+
+committee:
+  - role: product_manager
+    background: manufacturing
+    count: 2
+
+  - role: decision_maker
+    background: manufacturing
+    count: 1
+
+  - role: risk_manager
+    background: manufacturing
+    count: 2

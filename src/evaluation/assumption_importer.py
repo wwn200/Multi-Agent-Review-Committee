@@ -16,10 +16,15 @@ class AssumptionImporter:
 
         ID | Classification | Assumption | Description
 
+    Sheet: Model
+
+        One model description item per row in the first column.
+
     Each row represents one assumption.
     """
 
     ASSUMPTION_SHEET = "Assumption"
+    CONTEXT_SHEET = "Model"
 
     REQUIRED_COLUMNS = [
         "ID",
@@ -134,6 +139,8 @@ class AssumptionImporter:
                 f"was not found in the Excel file."
             ) from exc
 
+        context = self._read_context(file_path)
+
         # --------------------------------------------------
         # Validate columns
         # --------------------------------------------------
@@ -149,6 +156,7 @@ class AssumptionImporter:
         assumption_set = self._build_assumption_set(
             assumption_df=assumption_df,
             assumption_set_name=model_name,
+            context=context,
         )
 
         # --------------------------------------------------
@@ -233,6 +241,7 @@ class AssumptionImporter:
         self,
         assumption_df: pd.DataFrame,
         assumption_set_name: str,
+        context: list[str],
     ) -> dict:
         """
         Convert the DataFrame into the standard
@@ -287,8 +296,34 @@ class AssumptionImporter:
         return {
             "assumption_set_name": assumption_set_name,
             "version": "1.0",
+            "context": context,
             "assumptions": assumptions,
         }
+
+    def _read_context(self, file_path: Path) -> list[str]:
+        """Read model context items from the first Context column."""
+        try:
+            context_df = pd.read_excel(
+                file_path,
+                sheet_name=self.CONTEXT_SHEET,
+                header=None,
+            )
+        except ValueError:
+            return []
+
+        if context_df.empty:
+            return []
+
+        context = []
+        for value in context_df.iloc[:, 0]:
+            if pd.isna(value):
+                continue
+
+            text = str(value).strip()
+            if text:
+                context.append(text)
+
+        return context
 
     def _validate_assumption_set(
         self,

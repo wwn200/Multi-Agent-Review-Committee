@@ -89,12 +89,6 @@ The model represents a manufacturing production planning system.
 It is used to determine production schedules and allocate products
 to production lines.
 
-The model assumes that the production line can be used interchangeably
-for all product types. In other words, all product types can be
-processed on the same production line without requiring
-product-specific equipment, major setup changes, or significant
-reconfiguration.
-
 The purpose of the model is to support production planning and
 scheduling decisions in a manufacturing environment.
 """
@@ -105,8 +99,7 @@ Evaluate the following model assumption:
 "The equipment failure rate remains stable over the planning horizon."
 
 Assess both the potential impact and fidelity of this assumption.
-Consider the assumption from the perspective of a product manager
-working in a manufacturing environment.
+Consider the assumption from the perspective of your role, knowledge and background.
 
 Provide the scores for Potential Impact and Fidelity, as well as the scores for their respective attributes.
 

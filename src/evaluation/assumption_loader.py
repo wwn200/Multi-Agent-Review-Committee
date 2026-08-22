@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+import yaml
+
 
 class AssumptionLoader:
     """
@@ -40,20 +42,12 @@ class AssumptionLoader:
             config/models/test_model.json
         """
 
-        assumption_path = (
-            self.assumption_dir
-            / f"{model_name}.json"
-        )
+        assumption_path = self._find_model_path(model_name)
 
-        if not assumption_path.exists():
+        if assumption_path is None:
             raise FileNotFoundError(
                 f"Assumption set not found: "
                 f"{model_name}"
-            )
-
-        if assumption_path.suffix.lower() != ".json":
-            raise ValueError(
-                "Assumption file must be a .json file."
             )
 
         with open(
@@ -61,7 +55,10 @@ class AssumptionLoader:
             "r",
             encoding="utf-8",
         ) as f:
-            assumption_set = json.load(f)
+            if assumption_path.suffix.lower() == ".json":
+                assumption_set = json.load(f)
+            else:
+                assumption_set = yaml.safe_load(f)
 
         self._validate_assumption_set(
             assumption_set,
@@ -77,9 +74,19 @@ class AssumptionLoader:
         """
 
         return sorted(
-            path.stem
-            for path in self.assumption_dir.glob("*.json")
+            {path.stem for path in self.assumption_dir.glob("*.json")}
+            | {path.stem for path in self.assumption_dir.glob("*.yaml")}
+            | {path.stem for path in self.assumption_dir.glob("*.yml")}
         )
+
+    def _find_model_path(self, model_name: str) -> Path | None:
+        """Find a model configuration in the supported config formats."""
+        for suffix in (".yaml", ".yml", ".json"):
+            path = self.assumption_dir / f"{model_name}{suffix}"
+            if path.exists():
+                return path
+
+        return None
 
     def _validate_assumption_set(
         self,
@@ -118,6 +125,16 @@ class AssumptionLoader:
         assumptions = assumption_set[
             "assumptions"
         ]
+
+        context = assumption_set.get("context", [])
+        if not isinstance(context, list) or any(
+            not isinstance(item, str) or not item.strip()
+            for item in context
+        ):
+            raise ValueError(
+                f"Invalid assumption set '{assumption_name}': "
+                "'context' must be a list of non-empty strings."
+            )
 
         if not isinstance(
             assumptions,
