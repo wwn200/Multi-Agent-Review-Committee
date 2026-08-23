@@ -1,0 +1,10 @@
+committee_name: shorttest_committee
+
+committee:
+  - role: decision_maker
+    background: manufacturing
+    count: 1
+
+  - role: risk_manager
+    background: manufacturing
+    count: 2
