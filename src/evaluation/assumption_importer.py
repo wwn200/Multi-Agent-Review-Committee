@@ -1,14 +1,14 @@
-import json
 import shutil
 from pathlib import Path
 
 import pandas as pd
+import yaml
 
 
 class AssumptionImporter:
     """
     Import an assumption set from an XLSX file
-    and convert it into the standard JSON representation.
+    and convert it into the standard YAML representation.
 
     Expected Excel structure
     ------------------------
@@ -46,7 +46,7 @@ class AssumptionImporter:
             / "model"
         )
 
-        # Standard JSON configuration
+        # Standard YAML configuration
         self.assumption_dir = (
             self.project_root
             / "config"
@@ -168,7 +168,7 @@ class AssumptionImporter:
         )
 
         # --------------------------------------------------
-        # Generate JSON filename
+        # Generate YAML filename
         # --------------------------------------------------
 
         assumption_id = self._make_assumption_id(
@@ -177,11 +177,11 @@ class AssumptionImporter:
 
         output_path = (
             self.assumption_dir
-            / f"{assumption_id}.json"
+            / f"{assumption_id}.yaml"
         )
 
         # --------------------------------------------------
-        # Save JSON
+        # Save YAML
         # --------------------------------------------------
 
         with open(
@@ -189,11 +189,11 @@ class AssumptionImporter:
             "w",
             encoding="utf-8",
         ) as f:
-            json.dump(
+            yaml.safe_dump(
                 assumption_set,
                 f,
-                indent=4,
-                ensure_ascii=False,
+                sort_keys=False,
+                allow_unicode=True,
             )
 
         print("Assumption set imported successfully:")
@@ -212,8 +212,11 @@ class AssumptionImporter:
         """
 
         return sorted(
-            path.stem
-            for path in self.assumption_dir.glob("*.json")
+            {
+                path.stem
+                for pattern in ("*.yaml", "*.yml", "*.json")
+                for path in self.assumption_dir.glob(pattern)
+            }
         )
 
     def _validate_columns(
@@ -245,7 +248,7 @@ class AssumptionImporter:
     ) -> dict:
         """
         Convert the DataFrame into the standard
-        assumption set JSON structure.
+        assumption set YAML structure.
         """
 
         assumptions = []

@@ -1,10 +1,12 @@
 import json
 from pathlib import Path
 
+import yaml
+
 
 class RubricLoader:
     """
-    Load standardized evaluation rubrics from JSON files.
+    Load standardized evaluation rubrics from YAML files.
     """
 
     def __init__(self, project_root: Path | None = None):
@@ -28,11 +30,9 @@ class RubricLoader:
 
         rubric_id = self._normalize_name(rubric_name)
 
-        rubric_path = (
-            self.rubric_dir / f"{rubric_id}.json"
-        )
+        rubric_path = self._find_rubric_path(rubric_id)
 
-        if not rubric_path.exists():
+        if rubric_path is None:
             raise FileNotFoundError(
                 f"Rubric not found: {rubric_name}"
             )
@@ -42,7 +42,10 @@ class RubricLoader:
             "r",
             encoding="utf-8",
         ) as f:
-            rubric = json.load(f)
+            if rubric_path.suffix.lower() in {".yaml", ".yml"}:
+                rubric = yaml.safe_load(f)
+            else:
+                rubric = json.load(f)
 
         self._validate(rubric)
 
@@ -57,9 +60,19 @@ class RubricLoader:
             return []
 
         return sorted(
-            path.stem
-            for path in self.rubric_dir.glob("*.json")
+            {path.stem for path in self.rubric_dir.glob("*.yaml")}
+            | {path.stem for path in self.rubric_dir.glob("*.yml")}
+            | {path.stem for path in self.rubric_dir.glob("*.json")}
         )
+
+    def _find_rubric_path(self, rubric_id: str) -> Path | None:
+        """Find a rubric, preferring YAML over legacy JSON."""
+        for suffix in (".yaml", ".yml", ".json"):
+            path = self.rubric_dir / f"{rubric_id}{suffix}"
+            if path.exists():
+                return path
+
+        return None
 
     def _validate(self, rubric: dict) -> None:
         """Validate the basic structure of a rubric."""
@@ -93,7 +106,7 @@ class RubricLoader:
     @staticmethod
     def _normalize_name(name: str) -> str:
         """
-        Normalize a rubric name to the JSON filename format.
+        Normalize a rubric name to the YAML filename format.
         """
 
         return (

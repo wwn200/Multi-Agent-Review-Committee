@@ -173,4 +173,4 @@ if __name__ == "__main__":
     main()
 
 #python main.py import-rubric test_rubric   
-#python main.py evaluate-model cutting_stock_model  
+#python main.py evaluate-model test_committee cutting_stock_model test_rubric

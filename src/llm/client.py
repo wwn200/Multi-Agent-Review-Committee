@@ -2,7 +2,8 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from pathlib import Path
 import os
-import json
+
+import yaml
 
 
 class LLMClient:
@@ -23,13 +24,13 @@ class LLMClient:
         settings_path = (
             project_root
             / "config"
-            / "setting.json"
+            / "setting.yaml"
         )
 
         with open(settings_path, "r", encoding="utf-8") as f:
-            settings = json.load(f)
+            settings = yaml.safe_load(f)
 
-        self.model = settings["llm"]["model"]
+        self.model = settings["llm"]["default_model"]
 
         self.client = OpenAI(api_key=api_key)
 

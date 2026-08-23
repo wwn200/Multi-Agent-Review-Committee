@@ -1,0 +1,67 @@
+rubric_name: test_rubric
+version: '1.0'
+scale:
+  min: 1
+  max: 5
+general_guidance:
+- a Likert-scale approach is preferred due to its simplicity and ease of interpretation.
+- The evaluator assigns a score from 1 to 5 based on the descriptions of each attribute
+  and the rubric.
+- The scores for the two types, Potential Impact and Fidelity, are calculated based
+  on the scores of their respective attributes. The weight assigned to each attribute
+  is determined by the evaluator based on their own concerns and attention.
+criteria:
+- type: Potential Impact
+  attribute: Importance
+  question: How important is assumption A for the validity of the model?
+  scores:
+    '1': Not important
+    '2': Somewhat important
+    '3': Moderately important
+    '4': Quite important
+    '5': Extremely important
+- type: Potential Impact
+  attribute: Risk
+  question: How much risk is there if the assumption A does not reflect reality?
+  scores:
+    '1': No impact
+    '2': Minor deviation
+    '3': Moderate deviation
+    '4': Significant deviation
+    '5': Serious adverse outcomes
+- type: Potential Impact
+  attribute: Usability
+  question: How important is assumption A for usability or simplifying computation?
+  scores:
+    '1': Not important
+    '2': Somewhat important
+    '3': Moderately important
+    '4': Quite important
+    '5': Extremely important
+- type: Fidelity
+  attribute: Confidence
+  question: How confident are you that assumption A reflects reality?
+  scores:
+    '1': Not confident
+    '2': Somewhat uncertain
+    '3': Moderately confident
+    '4': Quite confident
+    '5': Extremely confident
+- type: Fidelity
+  attribute: Evidence
+  question: To what extent can assumption A be validated using data or simulation?
+  scores:
+    '1': Can not be validated
+    '2': Minimal evidence
+    '3': Simulation only
+    '4': Mostly validated
+    '5': Fully validated
+- type: Fidelity
+  attribute: Robustness
+  question: To what extent are extreme conditions of assumption A accounted for?
+  scores:
+    '1': Not considered
+    '2': Rarely considered
+    '3': Partially accounted
+    '4': Mostly accounted
+    '5': Fully accounted

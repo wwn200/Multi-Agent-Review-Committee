@@ -1,14 +1,14 @@
-import json
 import shutil
 from pathlib import Path
 
 import pandas as pd
+import yaml
 
 
 class RubricImporter:
     """
     Import an evaluation rubric from an XLSX file
-    and convert it into the standard JSON representation.
+    and convert it into the standard YAML representation.
 
     Expected Excel structure
     ------------------------
@@ -146,7 +146,7 @@ class RubricImporter:
         self._validate_rubric(rubric)
 
         # --------------------------------------------------
-        # Generate JSON filename
+        # Generate YAML filename
         # --------------------------------------------------
 
         rubric_id = self._make_rubric_id(
@@ -155,11 +155,11 @@ class RubricImporter:
 
         output_path = (
             self.rubric_dir
-            / f"{rubric_id}.json"
+            / f"{rubric_id}.yaml"
         )
 
         # --------------------------------------------------
-        # Save JSON
+        # Save YAML
         # --------------------------------------------------
 
         with open(
@@ -167,11 +167,11 @@ class RubricImporter:
             "w",
             encoding="utf-8",
         ) as f:
-            json.dump(
+            yaml.safe_dump(
                 rubric,
                 f,
-                indent=4,
-                ensure_ascii=False,
+                sort_keys=False,
+                allow_unicode=True,
             )
 
         print("Rubric imported successfully:")
@@ -245,7 +245,7 @@ class RubricImporter:
     ) -> dict:
         """
         Convert the Excel workbook into the standard
-        rubric JSON structure.
+        rubric YAML structure.
         """
 
         criteria = []

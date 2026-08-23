@@ -6,7 +6,7 @@ import yaml
 
 class AssumptionLoader:
     """
-    Load a standardized assumption set from JSON.
+    Load a standardized assumption set from YAML files.
     """
 
     def __init__(self, project_root: Path | None = None):
@@ -39,7 +39,7 @@ class AssumptionLoader:
 
         loads:
 
-            config/models/test_model.json
+            config/models/test_model.yaml
         """
 
         assumption_path = self._find_model_path(model_name)
@@ -55,10 +55,10 @@ class AssumptionLoader:
             "r",
             encoding="utf-8",
         ) as f:
-            if assumption_path.suffix.lower() == ".json":
-                assumption_set = json.load(f)
-            else:
+            if assumption_path.suffix.lower() in {".yaml", ".yml"}:
                 assumption_set = yaml.safe_load(f)
+            else:
+                assumption_set = json.load(f)
 
         self._validate_assumption_set(
             assumption_set,
@@ -105,7 +105,7 @@ class AssumptionLoader:
             raise ValueError(
                 f"Invalid assumption set "
                 f"'{assumption_name}': "
-                f"root must be a JSON object."
+                f"root must be a configuration object."
             )
 
         required_fields = [

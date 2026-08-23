@@ -1,5 +1,5 @@
 from pathlib import Path
-import json
+import yaml
 
 from src.evaluation.rubric_importer import RubricImporter
 
@@ -14,15 +14,15 @@ def test_import_xlsx(tmp_path):
     output_path = importer.import_xlsx(test_file)
 
     assert output_path.exists()
-    assert output_path.name == "test_rubric.json"
+    assert output_path.name == "test_rubric.yaml"
 
-    # Load generated JSON
+    # Load generated YAML
     with open(
         output_path,
         "r",
         encoding="utf-8",
     ) as f:
-        rubric = json.load(f)
+        rubric = yaml.safe_load(f)
 
     # Check basic information
     assert rubric["rubric_name"] == "test_rubric"
