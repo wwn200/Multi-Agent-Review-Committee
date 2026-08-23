@@ -1,41 +1,41 @@
-# Stakeholder Profiles
+# Evaluator Profiles
 
-## 1. Technical Engineer
+Evaluator profile definitions are stored in YAML files under
+`config/agents/roles/` and `config/agents/backgrounds/`.
 
-### Role
+## Role Configuration
 
-Technical evaluator responsible for assessing technical feasibility...
+A role defines the evaluator's general identity and default perspective:
 
-### Expertise
+```yaml
+name: product_manager
+expertise:
+  product_strategy: high
+base_traits: {}
+default_attention_weights: {}
+default_concerns: []
+```
 
-- System engineering
-- Reliability
-- Performance
+The actual role files may contain additional trait distributions and
+attention-weight definitions.
 
-### Objectives
+## Background Configuration
 
-- Ensure technical feasibility
-- Minimize technical risk
+A background adds contextual information and modifies role behavior:
 
-### Concerns
+```yaml
+name: manufacturing
+traits: {}
+attention_weights: {}
+concerns: []
+contextual_information: {}
+```
 
-- Failure probability
-- Performance degradation
-- Technology maturity
+When a background is configured for a committee member, it is merged with the
+role before individual profiles are sampled.
 
-### Risk Tolerance
+## Sampling
 
-Low
-
-### Decision Authority
-
-Recommendation
-
-### Evaluation Priorities
-
-| Criterion | Weight |
-|---|---:|
-| Technical performance | 0.40 |
-| Reliability | 0.30 |
-| Cost | 0.10 |
-| Schedule | 0.20 |
+`EvaluatorSampler` samples traits and perturbs attention weights using the
+workflow seed. Supplying a seed to `EvaluationWorkflow` makes profile
+generation reproducible for testing.

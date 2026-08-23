@@ -1,62 +1,51 @@
+# Agent Design
 
-## 1. Agent Architecture
+## Agent Composition
 
-Agent
-├── Role
-├── Expertise
-├── Objectives
-├── Concerns
-├── Risk Tolerance
-├── Decision Authority
-└── Evaluation Criteria
+Each evaluator agent combines:
 
+1. A role, such as product manager or risk manager.
+2. A role-specific expertise and evaluation perspective.
+3. An optional organizational or industry background.
+4. Sampled traits, attention weights, concerns, and evidence preferences.
+5. A prompt builder that creates the system and user prompts.
+6. An LLM client that generates the evaluation response.
 
-An evaluator agent is represented by four major components:
+## Prompt Construction
 
-1. Role
-2. Knowledge and expertise
-3. Stakeholder objectives and preferences
-4. Banlance of evaluation criteria
+The system prompt contains the evaluator identity, background, expertise,
+evaluation behavior, concerns, rubric, and output requirements.
 
+The user prompt contains:
 
-An example of prompts
+- The model context loaded from the model configuration.
+- The fixed evaluation task template.
+- The current assumption target, including ID, name, and description.
 
-You must evaluate the proposed alternative according to the
-following evaluation rubric.
+Every evaluator receives the same context, rubric, and target. Differences in
+responses come from the evaluator profiles and the LLM's reasoning.
 
-Evaluation Scale:
-1 = Very poor
-2 = Poor
-3 = Moderate
-4 = Good
-5 = Excellent
+## Population Sampling
 
-Criterion 1: Technical Feasibility
-Description:
-Degree to which the technology can achieve required functions.
+A committee entry defines a role, an optional background, and a count:
 
-Scoring guidance:
-1 = Not feasible
-3 = Partially feasible
-5 = Highly feasible
+```yaml
+committee:
+  - role: product_manager
+    background: manufacturing
+    count: 2
+```
 
-Criterion 2: Cost
-Description:
-Relative implementation cost.
+The committee creates two separate evaluator agents with IDs such as
+`product_manager_001` and `product_manager_002`.
 
-Scoring guidance:
-1 = Very high
-3 = Moderate
-5 = Very low
+## Evaluation Result
 
-Criterion 3: Schedule
-Description:
-Difficulty of meeting target schedule.
+Each agent returns an `EvaluationResult` containing:
 
-Scoring guidance:
-1 = Very difficult
-3 = Moderate
-5 = Easy
+- `evaluator_id`
+- `response`
+- `raw_response`
 
-You must evaluate every criterion according to the definitions
-and scoring guidance above.
+The executor does not combine these results. A later aggregation component can
+consume the returned list.

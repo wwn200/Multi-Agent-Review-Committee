@@ -1,0 +1,9 @@
+# Runtime dependencies
+openai
+python-dotenv
+pandas
+openpyxl
+PyYAML
+
+# Test dependencies
+pytest
