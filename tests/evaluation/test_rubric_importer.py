@@ -1,7 +1,7 @@
 from pathlib import Path
 import yaml
 
-from src.evaluation.rubric_importer import RubricImporter
+from src.data.importers.rubric_importer import RubricImporter
 
 
 def test_import_xlsx(tmp_path):

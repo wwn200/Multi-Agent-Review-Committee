@@ -1,11 +1,11 @@
 import argparse
 
-from src.evaluation.rubric_importer import RubricImporter
-from src.evaluation.rubric_loader import RubricLoader
-from src.evaluation.assumption_importer import AssumptionImporter
-from src.evaluation.assumption_loader import AssumptionLoader
+from src.data.importers.rubric_importer import RubricImporter
+from src.data.loaders.rubric_loader import RubricLoader
+from src.data.importers.assumption_importer import AssumptionImporter
+from src.data.loaders.assumption_loader import AssumptionLoader
 from src.llm.client import LLMClient
-from src.output.excel_writer import EvaluationResultWriter
+from src.data.writers.excel_writer import EvaluationResultWriter
 from src.workflow.config import WorkflowConfigLoader
 from src.workflow.workflow import EvaluationWorkflow
 

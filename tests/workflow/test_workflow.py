@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from src.evaluation.assumption_loader import AssumptionLoader
+from src.data.loaders.assumption_loader import AssumptionLoader
 from src.workflow.config import WorkflowConfigLoader
 from src.workflow.workflow import EvaluationWorkflow
 

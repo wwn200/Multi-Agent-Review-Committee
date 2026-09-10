@@ -37,7 +37,7 @@ class RubricImporter:
 
     def __init__(self, project_root: Path | None = None):
         if project_root is None:
-            project_root = Path(__file__).resolve().parents[2]
+            project_root = Path(__file__).resolve().parents[3]
 
         self.project_root = project_root
 

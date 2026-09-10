@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from ..agents.committee import EvaluatorAgentCommittee
-from ..evaluation.assumption_loader import AssumptionLoader
-from ..evaluation.rubric_loader import RubricLoader
+from ..data.loaders.assumption_loader import AssumptionLoader
+from ..data.loaders.rubric_loader import RubricLoader
 from ..evaluation.rubric_validator import RubricValidator
 from ..llm.client import LLMClient
 

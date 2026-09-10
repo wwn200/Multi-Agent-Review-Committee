@@ -1,4 +1,4 @@
-from src.evaluation.rubric_loader import RubricLoader
+from src.data.loaders.rubric_loader import RubricLoader
 from src.evaluation.rubric_validator import RubricValidator
 from src.evaluation.rubric_prompt import build_rubric_prompt
 
