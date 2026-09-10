@@ -4,6 +4,7 @@ from src.data.importers.rubric_importer import RubricImporter
 from src.data.loaders.rubric_loader import RubricLoader
 from src.data.importers.assumption_importer import AssumptionImporter
 from src.data.loaders.assumption_loader import AssumptionLoader
+from src.data.importers.result_importer import EvaluationResultLoader
 from src.llm.client import LLMClient
 from src.data.writers.excel_writer import EvaluationResultWriter
 from src.workflow.config import WorkflowConfigLoader
@@ -71,6 +72,20 @@ def main():
     )
 
     # --------------------------------------------------
+    # import-result command
+    # --------------------------------------------------
+
+    result_import_parser = subparsers.add_parser(
+        "import-result",
+        help="Load an evaluation result Excel file for visualization.",
+    )
+
+    result_import_parser.add_argument(
+        "filename",
+        help="Evaluation result Excel filename in data/outputs.",
+    )
+
+    # --------------------------------------------------
     # evaluate-model command
     # --------------------------------------------------
 
@@ -132,6 +147,18 @@ def main():
         loader = AssumptionLoader()
         print(loader.list_assumptions())
         print(loader.load(args.model_name))
+
+    if args.command == "import-result":
+
+        try:
+            result_importer = EvaluationResultLoader()
+            result_data = result_importer.load(args.filename)
+        except (FileNotFoundError, ValueError) as exc:
+            parser.error(str(exc))
+
+        print(f"Evaluation result loaded from: {args.filename}")
+        print(f"Rows: {len(result_data)}")
+        print(result_data)
 
     if args.command == "evaluate-model":
 
