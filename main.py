@@ -5,6 +5,7 @@ from src.evaluation.rubric_loader import RubricLoader
 from src.evaluation.assumption_importer import AssumptionImporter
 from src.evaluation.assumption_loader import AssumptionLoader
 from src.llm.client import LLMClient
+from src.output.excel_writer import EvaluationResultWriter
 from src.workflow.config import WorkflowConfigLoader
 from src.workflow.workflow import EvaluationWorkflow
 
@@ -161,10 +162,19 @@ def main():
         except (FileNotFoundError, ValueError) as exc:
             parser.error(str(exc))
 
+        output_path = EvaluationResultWriter().save(
+            results=results,
+            model_name=args.model_name,
+            rubric_name=args.rubric_name,
+            committee_name=args.committee_name,
+        )
+
         for result in results:
             print(f"\n=== Evaluation Result ({result.assumption_id}) ===")
             print(result.evaluator_id)
             print(result.response)
+
+        print(f"\nEvaluation results saved to: {output_path}")
     
 
 
