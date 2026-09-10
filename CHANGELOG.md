@@ -1,5 +1,16 @@
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-09-10
+
+### Added
+- Added evaluation result export functionality, storing results in Excel format.
+- Added `assumption_id` to evaluation responses to distinguish results for different assumptions.
+
+### Changed
+- Evaluation types in the response template are now dynamically retrieved from the Rubric instead of being hard-coded.
+- Evaluation type scores now support decimal values between 1 and 5, rounded to two decimal places.
+- Evaluation type scores are calculated as weighted aggregations of attribute scores, with attribute weights determined by each agent based on its concerns and attention weights.
+
 ## [1.0.0] - 2026-08-23
 This release establishes the first complete version of the model evaluation framework, integrating rubric processing, 
 model assumption management, evaluator agent generation, and model evaluation into a unified workflow.
