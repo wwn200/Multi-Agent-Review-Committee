@@ -67,17 +67,14 @@ Provide your evaluation according to the specified rubric.
 
 Return your evaluation using the following structure:
 
-{
-    "potential_impact": <integer from 1 to 5>,
-    "fidelity": <integer from 1 to 5>,
-    "rationale": "<explanation supporting your evaluation>"
-}
+{score_structure}
 
 Requirements:
-- "potential_impact" must be an integer from 1 to 5.
-- "fidelity" must be an integer from 1 to 5.
+- Every attribute score must be an integer from 1 to 5.
+- Every type score can be any number between 1 to 5, rounded to two decimal places. 
+- The type score is calculated as a weighted aggregation of its attribute scores, with the weights for each attribute determined by the agent based on its concerns and attention weights.
 - "rationale" must explain the reasoning behind your evaluation.
-- Do not include additional fields.
+- Do not include fields other than those specified above.
 """
 
 EVALUATION_TASK_TEMPLATE = """\

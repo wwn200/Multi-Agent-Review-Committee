@@ -162,7 +162,8 @@ def main():
             parser.error(str(exc))
 
         for result in results:
-            print(f"\n=== Evaluation Result ({result.evaluator_id}) ===")
+            print(f"\n=== Evaluation Result ({result.assumption_id}) ===")
+            print(result.evaluator_id)
             print(result.response)
     
 

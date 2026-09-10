@@ -10,9 +10,10 @@ class EvaluationExecutor:
     def run(
         self,
         agents: list[EvaluatorAgent],
-        rubric: str,
+        rubric: str | dict,
         task: str,
         context: str,
+        assumption_id: str,
     ) -> list[EvaluationResult]:
         """Run an independent evaluation for each agent.
 
@@ -27,6 +28,7 @@ class EvaluationExecutor:
                 rubric=rubric,
                 task=task,
                 context=context,
+                assumption_id=assumption_id,
             )
             results.append(result)
 

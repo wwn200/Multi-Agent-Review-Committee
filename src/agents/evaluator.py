@@ -14,6 +14,7 @@ class EvaluationResult:
     Result returned by an evaluator agent.
     """
 
+    assumption_id: str
     evaluator_id: str
     response: str
     raw_response: Any | None = None
@@ -49,7 +50,7 @@ class EvaluatorAgent:
 
     def prepare_system_prompt(
         self,
-        rubric: str,
+        rubric: str | dict,
     ) -> str:
         """
         Build and store the system prompt for this evaluator.
@@ -70,9 +71,10 @@ class EvaluatorAgent:
 
     def evaluate(
         self,
-        rubric: str,
+        rubric: str | dict,
         context: str,
         task: str,
+        assumption_id: str,
     ) -> EvaluationResult:
         """
         Evaluate a specific assumption within an evaluation context.
@@ -99,6 +101,7 @@ class EvaluatorAgent:
         )
 
         return EvaluationResult(
+            assumption_id=assumption_id,
             evaluator_id=self.profile.evaluator_id,
             response=response,
             raw_response=response,

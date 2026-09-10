@@ -3,6 +3,10 @@ from __future__ import annotations
 from typing import Any
 
 from ..agents.profile.schema import EvaluatorProfile
+from ..evaluation.rubric_prompt import (
+    build_output_requirements,
+    build_rubric_prompt,
+)
 from .sections import (
     BackgroundSection,
     ConcernsSection,
@@ -63,7 +67,7 @@ class PromptBuilder:
     def build_system_prompt(
         self,
         profile: EvaluatorProfile,
-        rubric: str,
+        rubric: str | dict,
     ) -> str:
         """
         Build the system prompt for an evaluator.
@@ -108,7 +112,7 @@ class PromptBuilder:
     def _build_system_sections(
         self,
         profile: EvaluatorProfile,
-        rubric: str,
+        rubric: str | dict,
     ) -> list[PromptSection]:
         """
         Build all sections that belong to the system prompt.
@@ -122,7 +126,7 @@ class PromptBuilder:
             self._build_behavior_section(profile),
             self._build_concerns_section(profile),
             self._build_rubric_section(rubric),
-            self._build_output_requirements_section(),
+            self._build_output_requirements_section(rubric),
         ]
 
     def _build_sections(
@@ -278,8 +282,11 @@ class PromptBuilder:
 
     @staticmethod
     def _build_rubric_section(
-        rubric: str,
+        rubric: str | dict,
     ) -> RubricSection:
+        if isinstance(rubric, dict):
+            rubric = build_rubric_prompt(rubric)
+
         content = RUBRIC_TEMPLATE.format(
             rubric=rubric,
         )
@@ -306,8 +313,25 @@ class PromptBuilder:
 
     @staticmethod
     def _build_output_requirements_section(
+        rubric: str | dict,
     ) -> OutputRequirementsSection:
-        content = OUTPUT_REQUIREMENTS_TEMPLATE
+        if isinstance(rubric, dict):
+            score_structure = build_output_requirements(rubric)
+            content = OUTPUT_REQUIREMENTS_TEMPLATE.format(
+                score_structure=score_structure,
+            )
+        else:
+            content = OUTPUT_REQUIREMENTS_TEMPLATE.format(
+                score_structure=(
+                    '{\n'
+                    '    "<type>": {\n'
+                    '        "score": <any number between 1 to 5, rounded to two decimal places>,\n'
+                    '        "<attribute>": <integer from 1 to 5>\n'
+                    '    },\n'
+                    '    "rationale": "<explanation supporting your evaluation>"\n'
+                    '}'
+                ),
+            )
 
         return OutputRequirementsSection(
             name="Output Requirements",

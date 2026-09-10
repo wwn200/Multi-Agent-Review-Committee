@@ -3,7 +3,6 @@ from __future__ import annotations
 from ..agents.committee import EvaluatorAgentCommittee
 from ..evaluation.assumption_loader import AssumptionLoader
 from ..evaluation.rubric_loader import RubricLoader
-from ..evaluation.rubric_prompt import build_rubric_prompt
 from ..evaluation.rubric_validator import RubricValidator
 from ..llm.client import LLMClient
 
@@ -62,8 +61,6 @@ class EvaluationWorkflow:
 
         self.rubric_validator.validate(rubric)
 
-        rubric_prompt = build_rubric_prompt(rubric)
-
         # Step 3: Build the evaluator committee
         agents = self._build_committee(config)
 
@@ -79,13 +76,15 @@ class EvaluationWorkflow:
             task = task_template.format(
                 evaluation_target=evaluation_target,
             )
+            assumption_id = assumption['id']
 
             results.extend(
                 self.executor.run(
                     agents=agents,
-                    rubric=rubric_prompt,
+                    rubric=rubric,
                     context=context,
                     task=task,
+                    assumption_id = assumption_id
                 )
             )
 
