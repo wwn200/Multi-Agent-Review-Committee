@@ -77,6 +77,19 @@ For example:
 python main.py evaluate-model test_committee cutting_stock_model test_rubric
 ```
 
+Visualize an evaluation result:
+
+```bash
+python main.py visualize-result <model>_<rubric>_<committee> \
+  --aggregation mean
+```
+
+Result workbooks are loaded through `src.data.importers.result_importer`.
+Evaluation workbooks are stored as
+`data/outputs/<model>_<rubric>_<committee>/evaluation_result.xlsx`.
+The visualization is saved beside the workbook as
+`potential_impact_vs_fidelity.png`.
+
 The evaluation command does not accept context or task input. Context is
 loaded from the model workbook, and the task is constructed from
 `config/task_template.yaml` and each model assumption.

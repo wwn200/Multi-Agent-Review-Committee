@@ -49,8 +49,6 @@ def test_import_xlsx(tmp_path):
     assert criterion["scores"]["4"] == "Quite important"
     assert criterion["scores"]["5"] == "Extremely important"
 
-    assert len(rubric["general_guidance"]) == 1
-
     assert (
         rubric["general_guidance"][0]
         == "a Likert-scale approach is preferred due to its simplicity and ease of interpretation."

@@ -1,5 +1,15 @@
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-09-
+
+### Changed
+- Restructured evaluation result storage under `outputs/`. Each model-rubric-committee combination now has a dedicated output directory containing both the evaluation result file and its corresponding visualization figures.
+
+### Added
+- Added an evaluation result visualization module under `src/visualization`.
+- Added an assumption assessment scatter plot showing Potential Impact versus Fidelity scores.
+
+
 ## [1.1.0] - 2026-09-10
 
 ### Added
@@ -10,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - Evaluation types in the response template are now dynamically retrieved from the Rubric instead of being hard-coded.
 - Evaluation type scores now support decimal values between 1 and 5, rounded to two decimal places.
 - Evaluation type scores are calculated as weighted aggregations of attribute scores, with attribute weights determined by each agent based on its concerns and attention weights.
+
 
 ## [1.0.0] - 2026-08-23
 This release establishes the first complete version of the model evaluation framework, integrating rubric processing, 

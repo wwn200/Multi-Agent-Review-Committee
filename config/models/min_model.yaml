@@ -1,0 +1,31 @@
+assumption_set_name: cutting_stock_model
+version: '1.0'
+context:
+- The model represents a manufacturing production planning system. It is used to determine
+  production schedules and allocate products to production lines. The purpose of the
+  model is to support production planning and scheduling decisions in a manufacturing
+  environment.
+assumptions:
+- id: S1
+  classification: Operating Conditions
+  name: Production Time Insensitivity
+  description: Products are assumed to have flexible delivery requirements, allowing
+    products from the original cutting plan to be returned to the order pool and rescheduled
+    in subsequent production batches during the replanning process. In reality, some
+    products may be associated with urgent delivery deadlines and therefore cannot
+    be postponed or returned to the order pool, limiting the flexibility of cutting
+    plan adjustments.
+- id: S2
+  classification: Operating Conditions
+  name: Simplified Production Line
+  description: The system is assumed to involve a single or simplified production
+    line; in reality, multiple heterogeneous production lines may exist simultaneously.
+- id: S3
+  classification: System Behavior
+  name: Sufficiently Large Order Pool
+  description: The order pool is assumed to be sufficiently large and fully available
+    for replanning, allowing product demands to be freely reassigned during the cutting
+    adjustment process. In reality, the set of orders available for replanning may
+    be restricted by practical considerations such as production site requirements,
+    customer-specific constraints, or other operational limitations, resulting in
+    a more limited and less flexible order pool.

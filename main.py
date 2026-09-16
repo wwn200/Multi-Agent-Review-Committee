@@ -5,6 +5,7 @@ from src.data.loaders.rubric_loader import RubricLoader
 from src.data.importers.assumption_importer import AssumptionImporter
 from src.data.loaders.assumption_loader import AssumptionLoader
 from src.data.importers.result_importer import EvaluationResultLoader
+from src.visualization import EvaluationVisualizer
 from src.llm.client import LLMClient
 from src.data.writers.excel_writer import EvaluationResultWriter
 from src.workflow.config import WorkflowConfigLoader
@@ -82,7 +83,28 @@ def main():
 
     result_import_parser.add_argument(
         "filename",
-        help="Evaluation result Excel filename in data/outputs.",
+        help="Evaluation result directory name or workbook path.",
+    )
+
+    # --------------------------------------------------
+    # visualize-result command
+    # --------------------------------------------------
+
+    visualize_parser = subparsers.add_parser(
+        "visualize-result",
+        help="Visualize the evaluation results.",
+    )
+
+    visualize_parser.add_argument(
+        "filename",
+        help="Evaluation result directory name or workbook path.",
+    )
+
+    visualize_parser.add_argument(
+        "--aggregation",
+        choices=("mean", "median"),
+        default="mean",
+        help="Aggregation method for evaluator scores.",
     )
 
     # --------------------------------------------------
@@ -160,6 +182,16 @@ def main():
         print(f"Rows: {len(result_data)}")
         print(result_data)
 
+    if args.command == "visualize-result":
+        visualizer = EvaluationVisualizer()
+        try:
+            visualizer.plot_result_file(
+                args.filename,
+                aggregation=args.aggregation,
+            )
+        except (FileNotFoundError, ValueError) as exc:
+            parser.error(str(exc))
+
     if args.command == "evaluate-model":
 
         # Check the committee first. It must already exist and is never
@@ -212,3 +244,4 @@ if __name__ == "__main__":
 
 #python main.py import-rubric test_rubric   
 #python main.py evaluate-model test_committee cutting_stock_model test_rubric
+#python main.py visualize-result min_model_test_rubric_test_committee

@@ -3,6 +3,7 @@ openai
 python-dotenv
 pandas
 openpyxl
+matplotlib
 PyYAML
 
 # Test dependencies

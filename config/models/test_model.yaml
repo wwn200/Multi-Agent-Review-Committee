@@ -20,4 +20,44 @@ assumptions:
   name: Simplified Production Line
   description: The system is assumed to involve a single or simplified production
     line; in reality, multiple heterogeneous production lines may exist simultaneously.
-
+- id: S3
+  classification: System Behavior
+  name: Sufficiently Large Order Pool
+  description: The order pool is assumed to be sufficiently large and fully available
+    for replanning, allowing product demands to be freely reassigned during the cutting
+    adjustment process. In reality, the set of orders available for replanning may
+    be restricted by practical considerations such as production site requirements,
+    customer-specific constraints, or other operational limitations, resulting in
+    a more limited and less flexible order pool.
+- id: S4
+  classification: System Behavior
+  name: Deterministic Defect Value Representation
+  description: Product values and regional value ratios are assumed to be deterministic
+    and predefined. In reality, these parameters may vary across products. For example,
+    the same defect may have different impacts on different product types, implying
+    that the corresponding value ratio may not be uniform across all products.
+- id: S5
+  classification: System Behavior
+  name: Guillotine Cutting Constraint
+  description: Cutting operations are assumed to follow guillotine-cutting rules with
+    sequential straight-line cuts; in reality, more flexible cutting patterns may
+    be feasible.
+- id: S6
+  classification: Data and Observation
+  name: Known Defect Distribution
+  description: Defect locations are assumed to be known and fixed after inspection;
+    in reality, defect information may contain uncertainty and observation errors.
+- id: S7
+  classification: Causal / Mechanistic Understanding
+  name: Value Judgment Mechanism
+  description: Product value is assumed to be determined solely by the most severe
+    defect contained within the product. In reality, multiple defects may jointly
+    influence product value and lead to additional downgrading effects.
+- id: S8
+  classification: Causal / Mechanistic Understanding
+  name: Simplified Cutting Process Mechanism
+  description: Cutting operations are assumed to follow simplified operational rules
+    and to be directly executable according to the generated cutting plan. In reality,
+    cutting processes may be influenced by additional operational and mechanical constraints,
+    such as machine configurations, cutting shaft arrangements, setup adjustments,
+    scrap removal requirements, and other production-related limitations.

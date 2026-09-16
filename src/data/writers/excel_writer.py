@@ -25,7 +25,7 @@ class EvaluationResultWriter:
         rubric_name: str,
         committee_name: str,
     ) -> Path:
-        """Write evaluation results to an Excel file and return its path."""
+        """Write results to a run directory and return the workbook path."""
 
         rows = [self._result_to_row(result) for result in results]
         dataframe = pd.DataFrame(rows)
@@ -39,15 +39,17 @@ class EvaluationResultWriter:
                 ]
             )
 
-        filename = "_".join(
+        result_directory_name = "_".join(
             self._safe_filename_part(value)
             for value in (
                 model_name,
                 rubric_name,
                 committee_name,
             )
-        ) + ".xlsx"
-        output_path = self.output_dir / filename
+        )
+        result_directory = self.output_dir / result_directory_name
+        result_directory.mkdir(parents=True, exist_ok=True)
+        output_path = result_directory / "evaluation_result.xlsx"
         dataframe.to_excel(output_path, index=False)
 
         return output_path
