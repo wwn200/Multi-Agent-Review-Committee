@@ -4,6 +4,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 from matplotlib.figure import Figure
 
 from src.data.importers.result_importer import EvaluationResultLoader
@@ -15,6 +16,12 @@ class EvaluationVisualizer:
     POTENTIAL_IMPACT_COLUMN = "potential_impact-score"
     FIDELITY_COLUMN = "fidelity-score"
     ASSUMPTION_COLUMN = "assumption_id"
+
+    ASSESSMENT_DIMENSIONS = {
+        "Potential Impact": POTENTIAL_IMPACT_COLUMN,
+        "Fidelity": FIDELITY_COLUMN,
+    }
+
     ASSUMPTION_ASSESSMENT_SCATTER_FILENAME = (
         "potential_impact_vs_fidelity"
     )
@@ -175,6 +182,90 @@ class EvaluationVisualizer:
 
         return fig
 
+    def plot_agent_score_distribution(
+        self,
+        df: pd.DataFrame,
+        score_column: str,
+        dimension_name: str,
+        figsize: tuple[float, float] = (10, 7),
+        show: bool = True,
+    ) -> Figure:
+        """Plot the distribution of agent scores for each assumption."""
+
+        required_columns = {
+            self.ASSUMPTION_COLUMN,
+            score_column,
+        }
+        missing_columns = required_columns - set(df.columns)
+
+        if missing_columns:
+            raise ValueError(
+                "Missing required columns: "
+                f"{sorted(missing_columns)}"
+            )
+
+        grouped_scores = (
+            df.groupby(self.ASSUMPTION_COLUMN)[score_column]
+            .apply(list)
+        )
+
+        assumptions = grouped_scores.index.tolist()
+        scores = grouped_scores.tolist()
+
+        fig, ax = plt.subplots(figsize=figsize)
+
+        positions = np.arange(1, len(assumptions) + 1)
+
+        ax.boxplot(
+            scores,
+            positions=positions,
+            widths=0.55,
+            patch_artist=True,
+        )
+
+        # Add individual agent scores as jittered points
+        rng = np.random.default_rng(42)
+
+        for position, assumption_scores in zip(positions, scores):
+            jitter = rng.uniform(
+                -0.08,
+                0.08,
+                size=len(assumption_scores),
+            )
+
+            ax.scatter(
+                position + jitter,
+                assumption_scores,
+                alpha=0.7,
+                s=35,
+            )
+
+        ax.set_xticks(positions)
+        ax.set_xticklabels(assumptions)
+
+        ax.set_xlabel("Assumption")
+        ax.set_ylabel(f"{dimension_name} Score")
+        ax.set_title(
+            f"{dimension_name} Score Distribution by Assumption"
+        )
+
+        ax.set_ylim(1, 5)
+        ax.set_yticks(range(1, 6))
+
+        ax.grid(
+            True,
+            axis="y",
+            alpha=0.3,
+            linestyle="--",
+        )
+
+        fig.tight_layout()
+
+        if show:
+            plt.show()
+
+        return fig
+
     def plot_result_file(
         self,
         result_file: str | Path,
@@ -191,8 +282,11 @@ class EvaluationVisualizer:
             method=aggregation,
         )
 
+        output_paths = {}
+
+        # Scatter plot
         scatter_path = result_path.parent / f"{self.ASSUMPTION_ASSESSMENT_SCATTER_FILENAME}.png"
-        heatmap_path = result_path.parent / f"{self.ASSUMPTION_ASSESSMENT_HEATMAP_FILENAME}.png"
+        output_paths["potential_impact_vs_fidelity"] = scatter_path
 
         figure1 = self.plot_assumption_assessment_scatter(
             aggregated,
@@ -206,6 +300,10 @@ class EvaluationVisualizer:
             bbox_inches="tight",
         )
 
+        # Heatmap plot
+        heatmap_path = result_path.parent / f"{self.ASSUMPTION_ASSESSMENT_HEATMAP_FILENAME}.png"
+        output_paths["assumption_assessment_heatmap"] = heatmap_path
+
         figure2 = self.plot_assumption_assessment_heatmap(
                     aggregated,
                     figsize=figsize,
@@ -216,7 +314,34 @@ class EvaluationVisualizer:
             dpi=300,
             bbox_inches="tight",
         )
-        return {
-            "potential_impact_vs_fidelity": scatter_path,
-            "assumption_assessment_heatmap": heatmap_path,
-        }
+
+        # Agent score distribution
+        for dimension_name, score_column in self.ASSESSMENT_DIMENSIONS.items():
+
+            filename = (
+                dimension_name.lower()
+                .replace(" ", "_")
+                + "_score_distribution.png"
+            )
+
+            distribution_path = result_path.parent / filename
+
+            figure = self.plot_agent_score_distribution(
+                df,
+                score_column=score_column,
+                dimension_name=dimension_name,
+                figsize=figsize,
+                show=show,
+            )
+
+            figure.savefig(
+                distribution_path,
+                dpi=300,
+                bbox_inches="tight",
+            )
+
+            output_paths[
+                f"{dimension_name.lower().replace(' ', '_')}_score_distribution"
+            ] = distribution_path
+
+        return output_paths

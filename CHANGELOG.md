@@ -7,8 +7,9 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - Added an evaluation result visualization module under `src/visualization`.
-- Added an assumption assessment scatter plot showing Potential Impact versus Fidelity scores.
-- Added an assumption assessment heatmap showing overview scores.
+- Added a scatter plot feature showing Potential Impact versus Fidelity scores.
+- Added a heatmap feature showing evaluation types overview scores.
+- Added a boxplot feature showing evaluation types scores distribution.
 
 
 ## [1.1.0] - 2026-09-10
