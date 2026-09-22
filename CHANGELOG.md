@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - Added a heatmap feature showing evaluation types overview scores.
 - Added a boxplot feature showing evaluation types scores distribution.
 - Added a frequency plots showing evaluation attributes scores (1–5) distribution.
+- Added a bar chart showing evaluation types scores by evaluator role.
 
 
 ## [1.1.0] - 2026-09-10

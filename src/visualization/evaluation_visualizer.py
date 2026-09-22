@@ -42,6 +42,7 @@ class EvaluationVisualizer:
     ASSUMPTION_ASSESSMENT_HEATMAP_FILENAME = (
     "assumption_assessment_heatmap"
 )
+    AGENT_ROLE_SCORE_FILENAME = "agent_role_score_comparison"
 
     def __init__(
         self,
@@ -330,6 +331,77 @@ class EvaluationVisualizer:
 
         return fig
 
+    def plot_agent_score_by_role(
+        self,
+        df: pd.DataFrame,
+        figsize: tuple[float, float] = (10, 7),
+        show: bool = True,
+    ) -> Figure:
+        """Plot mean assessment dimension scores grouped by evaluator role."""
+
+        required_columns = {
+            "evaluator_id",
+            *self.ASSESSMENT_DIMENSIONS.values(),
+        }
+        missing_columns = required_columns - set(df.columns)
+
+        if missing_columns:
+            raise ValueError(
+                "Missing required columns: "
+                f"{sorted(missing_columns)}"
+            )
+
+        role_scores = df.copy()
+        role_scores["evaluator_role"] = role_scores["evaluator_id"].astype(str).str.replace(
+            r"_\d+$",
+            "",
+            regex=True,
+        )
+        grouped_scores = role_scores.groupby("evaluator_role", sort=False)[
+            list(self.ASSESSMENT_DIMENSIONS.values())
+        ].mean()
+
+        roles = grouped_scores.index.tolist()
+        dimensions = list(self.ASSESSMENT_DIMENSIONS.items())
+        dimension_names = [dimension_name for dimension_name, _ in dimensions]
+        positions = np.arange(len(dimensions))
+        width = 0.8 / len(roles)
+
+        fig, ax = plt.subplots(figsize=figsize)
+
+        for index, role in enumerate(roles):
+            offset = (index - (len(roles) - 1) / 2) * width
+            bars = ax.bar(
+                positions + offset,
+                [grouped_scores.loc[role, score_column] for _, score_column in dimensions],
+                width=width,
+                label=role,
+            )
+
+            ax.bar_label(bars, fmt="%.2f", padding=3)
+
+        ax.set_xlabel("Assessment Dimension")
+        ax.set_ylabel("Mean Score")
+        ax.set_title("Assessment Scores by Evaluator Role")
+        ax.set_xticks(positions)
+        ax.set_xticklabels(dimension_names)
+        ax.set_ylim(1, 5)
+        ax.set_yticks(range(1, 6))
+        ax.legend(title="Evaluator Role")
+        ax.grid(
+            True,
+            axis="y",
+            alpha=0.3,
+            linestyle="--",
+        )
+
+        fig.tight_layout()
+
+        if show:
+            plt.show()
+
+        return fig
+
     def plot_result_file(
         self,
         result_file: str | Path,
@@ -435,5 +507,21 @@ class EvaluationVisualizer:
             output_paths[
                 f"{attribute_name.lower().replace(' ', '_')}_score_distribution"
             ] = distribution_path
+
+        # Assessment scores grouped by evaluator role
+        role_score_path = (
+            result_path.parent / f"{self.AGENT_ROLE_SCORE_FILENAME}.png"
+        )
+        role_score_figure = self.plot_agent_score_by_role(
+            df,
+            figsize=figsize,
+            show=show,
+        )
+        role_score_figure.savefig(
+            role_score_path,
+            dpi=300,
+            bbox_inches="tight",
+        )
+        output_paths[self.AGENT_ROLE_SCORE_FILENAME] = role_score_path
 
         return output_paths

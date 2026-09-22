@@ -12,6 +12,11 @@ from src.visualization import EvaluationVisualizer
 def _results() -> pd.DataFrame:
     return pd.DataFrame(
         {
+            "evaluator_id": [
+                "product_manager_001",
+                "product_manager_001",
+                "decision_maker_001",
+            ],
             "assumption_id": ["A", "A", "B"],
             "potential_impact-score": [4, 2, 5],
             "fidelity-score": [3, 5, 4],
@@ -51,6 +56,20 @@ def test_plot_agent_score_frequency_includes_all_five_scores():
     assert [bar.get_height() for bar in bars] == [1, 2, 0, 0, 0]
 
 
+def test_plot_agent_score_by_role_groups_dimension_scores():
+    visualizer = EvaluationVisualizer()
+
+    figure = visualizer.plot_agent_score_by_role(_results(), show=False)
+
+    axis = figure.axes[0]
+    assert [label.get_text() for label in axis.get_xticklabels()] == [
+        "Potential Impact",
+        "Fidelity",
+    ]
+    assert len(axis.patches) == 4
+    assert [bar.get_height() for bar in axis.patches] == [3.0, 4.0, 5.0, 4.0]
+
+
 def test_plot_result_file_saves_beside_result_workbook(tmp_path: Path):
     result_directory = tmp_path / "model_rubric_committee"
     result_directory.mkdir()
@@ -69,6 +88,7 @@ def test_plot_result_file_saves_beside_result_workbook(tmp_path: Path):
     assert (
         result_directory / "potential_impact_vs_fidelity.png"
     ).exists()
+    assert (result_directory / "agent_role_score_comparison.png").exists()
 
 
 def test_result_loader_accepts_explicit_xlsx_path(tmp_path: Path):
