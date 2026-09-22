@@ -1,6 +1,6 @@
 All notable changes to this project will be documented in this file.
 
-## [1.2.0] - 2026-09-
+## [1.2.0] - 2026-09-22
 
 ### Changed
 - Restructured evaluation result storage under `outputs/`. Each model-rubric-committee combination now has a dedicated output directory containing both the evaluation result file and its corresponding visualization figures.

@@ -24,6 +24,8 @@ assumption-level evaluation.
 - **Integrated evaluation workflow** — Coordinate configuration loading,
   evaluator construction, and assumption-level evaluation through a unified
   workflow.
+- **Evaluation visualization** — Generate assumption-level, score-distribution,
+  attribute-frequency, and evaluator-role visualizations from result workbooks.
 - **YAML-based configuration** — Store project configuration in a consistent
   YAML format.
 
@@ -87,8 +89,9 @@ python main.py visualize-result <model>_<rubric>_<committee> \
 Result workbooks are loaded through `src.data.importers.result_importer`.
 Evaluation workbooks are stored as
 `data/outputs/<model>_<rubric>_<committee>/evaluation_result.xlsx`.
-The visualization is saved beside the workbook as
-`potential_impact_vs_fidelity.png`.
+Visualizations are saved beside the workbook. See
+`docs/visualization.md` for the complete list of generated files and the
+programmatic API.
 
 The evaluation command does not accept context or task input. Context is
 loaded from the model workbook, and the task is constructed from
@@ -121,6 +124,6 @@ API tests are marked with `api` and require a valid API key.
 ## Project Status
 
 Version 1.0.0 provides a complete workflow for generating individual
-evaluator assessments of model assumptions. Aggregation of evaluator
-results, disagreement analysis, and higher-level model confidence
-assessment are not yet part of the workflow execution path.
+evaluator assessments of model assumptions. 
+
+Aggregation and visualization are performed afterward by `EvaluationVisualizer`.

@@ -61,5 +61,6 @@ returns `A * C` individual results.
 - `EvaluationExecutor` forwards one target to all committee agents.
 - `EvaluationWorkflow` coordinates the complete process.
 
-The current workflow does not aggregate scores or calculate disagreement
-statistics.
+The evaluation workflow produces individual evaluator results. The
+`EvaluationVisualizer` aggregates scores for assumption-level plots and role
+comparisons, and generates the result visualizations after evaluation.
