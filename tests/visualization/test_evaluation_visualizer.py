@@ -15,6 +15,12 @@ def _results() -> pd.DataFrame:
             "assumption_id": ["A", "A", "B"],
             "potential_impact-score": [4, 2, 5],
             "fidelity-score": [3, 5, 4],
+            "potential_impact-importance": [1, 2, 2],
+            "potential_impact-risk": [3, 3, 5],
+            "potential_impact-usability": [4, 4, 5],
+            "fidelity-confidence": [5, 4, 5],
+            "fidelity-evidence": [2, 2, 3],
+            "fidelity-robustness": [1, 1, 4],
         }
     )
 
@@ -28,6 +34,21 @@ def test_aggregate_by_assumption_supports_mean_and_median():
     assert list(mean["assumption_id"]) == ["A", "B"]
     assert mean.loc[0, "potential_impact-score"] == 3
     assert median.loc[0, "fidelity-score"] == 4
+
+
+def test_plot_agent_score_frequency_includes_all_five_scores():
+    visualizer = EvaluationVisualizer()
+
+    figure = visualizer.plot_agent_score_frequency(
+        _results(),
+        score_column="potential_impact-importance",
+        attribute_name="Importance",
+        show=False,
+    )
+
+    bars = figure.axes[0].patches
+    assert [bar.get_x() + bar.get_width() / 2 for bar in bars] == [1, 2, 3, 4, 5]
+    assert [bar.get_height() for bar in bars] == [1, 2, 0, 0, 0]
 
 
 def test_plot_result_file_saves_beside_result_workbook(tmp_path: Path):

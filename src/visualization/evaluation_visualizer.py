@@ -16,10 +16,24 @@ class EvaluationVisualizer:
     POTENTIAL_IMPACT_COLUMN = "potential_impact-score"
     FIDELITY_COLUMN = "fidelity-score"
     ASSUMPTION_COLUMN = "assumption_id"
+    IMPORTANCE_COLUMN = "potential_impact-importance"
+    RISK_COLUMN = "potential_impact-risk"
+    USABILITY_COLUMN = "potential_impact-usability"
+    CONFIDENCE_COLUMN = "fidelity-confidence"
+    EVIDENCE_COLUMN = "fidelity-evidence"
+    ROBUSTNESS_COLUMN = "fidelity-robustness"
 
     ASSESSMENT_DIMENSIONS = {
         "Potential Impact": POTENTIAL_IMPACT_COLUMN,
         "Fidelity": FIDELITY_COLUMN,
+    }
+    ASSESSMENT_ATTRIBUTES = {
+        "Importance": IMPORTANCE_COLUMN,
+        "Risk": RISK_COLUMN,
+        "Usability": USABILITY_COLUMN,
+        "Confidence": CONFIDENCE_COLUMN,
+        "Evidence": EVIDENCE_COLUMN,
+        "Robustness": ROBUSTNESS_COLUMN,
     }
 
     ASSUMPTION_ASSESSMENT_SCATTER_FILENAME = (
@@ -266,6 +280,56 @@ class EvaluationVisualizer:
 
         return fig
 
+    def plot_agent_score_frequency(
+        self,
+        df: pd.DataFrame,
+        score_column: str,
+        attribute_name: str,
+        figsize: tuple[float, float] = (10, 7),
+        show: bool = True,
+    ) -> Figure:
+        """Plot the frequency of each possible agent score for an attribute."""
+
+        required_columns = {
+            self.ASSUMPTION_COLUMN,
+            score_column,
+        }
+        missing_columns = required_columns - set(df.columns)
+
+        if missing_columns:
+            raise ValueError(
+                "Missing required columns: "
+                f"{sorted(missing_columns)}"
+            )
+
+        possible_scores = pd.Index(range(1, 6), name=score_column)
+        frequencies = df[score_column].value_counts().reindex(
+            possible_scores,
+            fill_value=0,
+        )
+
+        fig, ax = plt.subplots(figsize=figsize)
+        ax.bar(possible_scores, frequencies)
+
+        ax.set_xlabel("Score")
+        ax.set_ylabel("Frequency")
+        ax.set_title(f"{attribute_name} Score Frequency")
+        ax.set_xticks(possible_scores)
+        ax.set_xlim(0.5, 5.5)
+        ax.grid(
+            True,
+            axis="y",
+            alpha=0.3,
+            linestyle="--",
+        )
+
+        fig.tight_layout()
+
+        if show:
+            plt.show()
+
+        return fig
+
     def plot_result_file(
         self,
         result_file: str | Path,
@@ -315,7 +379,7 @@ class EvaluationVisualizer:
             bbox_inches="tight",
         )
 
-        # Agent score distribution
+        # Agent score distributions for assessment dimensions
         for dimension_name, score_column in self.ASSESSMENT_DIMENSIONS.items():
 
             filename = (
@@ -342,6 +406,34 @@ class EvaluationVisualizer:
 
             output_paths[
                 f"{dimension_name.lower().replace(' ', '_')}_score_distribution"
+            ] = distribution_path
+
+        # Agent score frequencies for assessment attributes
+        for attribute_name, score_column in self.ASSESSMENT_ATTRIBUTES.items():
+            filename = (
+                attribute_name.lower()
+                .replace(" ", "_")
+                + "_score_distribution.png"
+            )
+
+            distribution_path = result_path.parent / filename
+
+            figure = self.plot_agent_score_frequency(
+                df,
+                score_column=score_column,
+                attribute_name=attribute_name,
+                figsize=figsize,
+                show=show,
+            )
+
+            figure.savefig(
+                distribution_path,
+                dpi=300,
+                bbox_inches="tight",
+            )
+
+            output_paths[
+                f"{attribute_name.lower().replace(' ', '_')}_score_distribution"
             ] = distribution_path
 
         return output_paths

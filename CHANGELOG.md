@@ -4,12 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Restructured evaluation result storage under `outputs/`. Each model-rubric-committee combination now has a dedicated output directory containing both the evaluation result file and its corresponding visualization figures.
+- Updated `.gitignore` to exclude visualization `.png` files under the `outputs` directory from GitHub.
 
 ### Added
 - Added an evaluation result visualization module under `src/visualization`.
 - Added a scatter plot feature showing Potential Impact versus Fidelity scores.
 - Added a heatmap feature showing evaluation types overview scores.
 - Added a boxplot feature showing evaluation types scores distribution.
+- Added a frequency plots showing evaluation attributes scores (1–5) distribution.
 
 
 ## [1.1.0] - 2026-09-10

@@ -13,3 +13,6 @@ __pycache__/
 
 # Logs
 *.log
+
+# Generated output images
+/data/outputs/**/*.png
