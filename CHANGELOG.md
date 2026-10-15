@@ -1,5 +1,11 @@
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-10-
+
+### Changed
+- Updated the structure of input assumption Excel support given assumption Importance and dependency between assumptions.
+
+
 ## [1.2.0] - 2026-09-22
 
 ### Changed

@@ -14,7 +14,11 @@ class AssumptionImporter:
     ------------------------
     Sheet: Assumption
 
-        ID | Classification | Assumption | Description
+        ID | Classification | Assumption | Importance | Description | Selected
+
+    Sheet: Dependency
+
+        Source | Target | Dependency Strength
 
     Sheet: Model
 
@@ -24,13 +28,22 @@ class AssumptionImporter:
     """
 
     ASSUMPTION_SHEET = "Assumption"
+    DEPENDENCY_SHEET = "Dependency"
     CONTEXT_SHEET = "Model"
 
     REQUIRED_COLUMNS = [
         "ID",
         "Classification",
         "Assumption",
+        "Importance",
         "Description",
+        "Selected",
+    ]
+
+    DEPENDENCY_COLUMNS = [
+        "Source",
+        "Target",
+        "Dependency Strength",
     ]
 
     def __init__(self, project_root: Path | None = None):
@@ -131,6 +144,7 @@ class AssumptionImporter:
             assumption_df = pd.read_excel(
                 file_path,
                 sheet_name=self.ASSUMPTION_SHEET,
+                keep_default_na=False,
             )
         except ValueError as exc:
             raise ValueError(
@@ -139,6 +153,7 @@ class AssumptionImporter:
                 f"was not found in the Excel file."
             ) from exc
 
+        dependency_df = self._read_dependency(file_path)
         context = self._read_context(file_path)
 
         # --------------------------------------------------
@@ -148,6 +163,7 @@ class AssumptionImporter:
         self._validate_columns(
             assumption_df
         )
+        self._validate_dependency_columns(dependency_df)
 
         # --------------------------------------------------
         # Build assumption set
@@ -157,6 +173,7 @@ class AssumptionImporter:
             assumption_df=assumption_df,
             assumption_set_name=model_name,
             context=context,
+            dependency_df=dependency_df,
         )
 
         # --------------------------------------------------
@@ -240,11 +257,29 @@ class AssumptionImporter:
                 + ", ".join(missing_columns)
             )
 
+    def _validate_dependency_columns(
+        self,
+        df: pd.DataFrame,
+    ) -> None:
+        missing_columns = [
+            column
+            for column in self.DEPENDENCY_COLUMNS
+            if column not in df.columns
+        ]
+
+        if missing_columns:
+            raise ValueError(
+                "Missing required columns in "
+                f"'{self.DEPENDENCY_SHEET}' sheet: "
+                + ", ".join(missing_columns)
+            )
+
     def _build_assumption_set(
         self,
         assumption_df: pd.DataFrame,
         assumption_set_name: str,
         context: list[str],
+        dependency_df: pd.DataFrame,
     ) -> dict:
         """
         Convert the DataFrame into the standard
@@ -287,12 +322,48 @@ class AssumptionImporter:
                 )
             )
 
+            importance = self._clean_weight(
+                row["Importance"], "Importance", row_number + 2
+            )
+            selected = self._clean_selected(
+                row["Selected"], row_number + 2
+            )
+
             assumptions.append(
                 {
                     "id": assumption_id,
                     "classification": classification,
                     "name": assumption_name,
                     "description": description,
+                    "importance": importance,
+                    "selected": selected,
+                }
+            )
+
+        assumption_ids = {assumption["id"] for assumption in assumptions}
+        dependencies = []
+        for row_number, row in dependency_df.iterrows():
+            source = self._clean_required_value(
+                row["Source"], "Source", row_number + 2
+            )
+            target = self._clean_required_value(
+                row["Target"], "Target", row_number + 2
+            )
+            strength = self._clean_weight(
+                row["Dependency Strength"],
+                "Dependency Strength",
+                row_number + 2,
+            )
+            if source not in assumption_ids or target not in assumption_ids:
+                raise ValueError(
+                    f"Dependency at Excel row {row_number + 2} references "
+                    "an unknown assumption ID."
+                )
+            dependencies.append(
+                {
+                    "source": source,
+                    "target": target,
+                    "dependency_strength": strength,
                 }
             )
 
@@ -301,7 +372,21 @@ class AssumptionImporter:
             "version": "1.0",
             "context": context,
             "assumptions": assumptions,
+            "dependencies": dependencies,
         }
+
+    def _read_dependency(self, file_path: Path) -> pd.DataFrame:
+        try:
+            return pd.read_excel(
+                file_path,
+                sheet_name=self.DEPENDENCY_SHEET,
+                keep_default_na=False,
+            )
+        except ValueError as exc:
+            raise ValueError(
+                f"Required sheet '{self.DEPENDENCY_SHEET}' "
+                "was not found in the Excel file."
+            ) from exc
 
     def _read_context(self, file_path: Path) -> list[str]:
         """Read model context items from the first Context column."""
@@ -310,6 +395,7 @@ class AssumptionImporter:
                 file_path,
                 sheet_name=self.CONTEXT_SHEET,
                 header=None,
+                keep_default_na=False,
             )
         except ValueError:
             return []
@@ -327,6 +413,42 @@ class AssumptionImporter:
                 context.append(text)
 
         return context
+
+    @staticmethod
+    def _clean_weight(value, field: str, row_number: int) -> float:
+        if isinstance(value, bool) or pd.isna(value):
+            raise ValueError(
+                f"'{field}' at Excel row {row_number} must be a number in [0, 1]."
+            )
+        try:
+            value = float(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                f"'{field}' at Excel row {row_number} must be a number in [0, 1]."
+            ) from exc
+        if not 0 <= value <= 1:
+            raise ValueError(
+                f"'{field}' at Excel row {row_number} must be in [0, 1]."
+            )
+        return value
+
+    @staticmethod
+    def _clean_selected(value, row_number: int):
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            normalized = value.strip().lower()
+            if not normalized:
+                return "N/A"
+            if normalized == "true":
+                return True
+            if normalized == "false":
+                return False
+            if normalized == "n/a":
+                return "N/A"
+        raise ValueError(
+            f"'Selected' at Excel row {row_number} must be True, False, or N/A."
+        )
 
     def _validate_assumption_set(
         self,
@@ -352,6 +474,8 @@ class AssumptionImporter:
             classification = assumption["classification"]
             name = assumption["name"]
             description = assumption["description"]
+            importance = assumption["importance"]
+            selected = assumption["selected"]
 
             if not assumption_id:
                 raise ValueError(
@@ -384,6 +508,12 @@ class AssumptionImporter:
                 raise ValueError(
                     f"Description cannot be empty "
                     f"for assumption '{assumption_id}'."
+                )
+
+            self._clean_weight(importance, "Importance", 0)
+            if selected not in (True, False, "N/A"):
+                raise ValueError(
+                    f"Invalid Selected value for assumption '{assumption_id}'."
                 )
 
     @staticmethod

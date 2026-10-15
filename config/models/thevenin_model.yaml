@@ -1,0 +1,177 @@
+assumption_set_name: thevenin_model
+version: '1.0'
+context:
+- The model is a first-order Thevenin equivalent circuit model (ECM) for representing
+  the terminal voltage response of a lithium-ion battery under a specified range of
+  operating conditions. It consists of an open-circuit voltage source VOC(SOC), an
+  ohmic resistance R0, and a single RC polarization branch with resistance R1 and
+  capacitance C1. The model uses state-of-charge dynamics dSOC/dt = -ηI/Qn, polarization-voltage
+  dynamics dV1/dt = -V1/(R1C1) + I/C1, and terminal voltage Vt = VOC(SOC) - IR0 -
+  V1. Its purpose is to approximate the battery's observable electrical behavior without
+  explicitly modeling the underlying electrochemical mechanisms.
+assumptions:
+- id: S1
+  classification: Operating Conditions
+  name: Defined Operating Temperature Range
+  description: The battery is assumed to operate within a specified temperature range
+    over which the electrical model parameters are treated as constant. In reality,
+    changes in temperature can alter battery electrical characteristics, causing parameters
+    such as open-circuit voltage, ohmic resistance R0, and equivalent polarization
+    resistance and capacitance R1 and C1 to vary with temperature. Thus, treating
+    these parameters as fixed values implicitly assumes that their variation over
+    the specified temperature range is sufficiently small for the intended application.
+  importance: 0.8
+  selected: N/A
+- id: S2
+  classification: Operating Conditions
+  name: Defined SOC Operating Range
+  description: The model is assumed to be applied within a specified range of SOC
+    values. Within this range, the identified relationship between SOC and open-circuit
+    voltage, as well as the corresponding values of the equivalent circuit parameters,
+    are assumed to remain representative of the battery behavior. Outside this range,
+    the SOC–OCV relationship may change, and parameters such as ohmic resistance R0
+    and equivalent polarization resistance and capacitance R1 and C1 may exhibit different
+    values. Consequently, the model parameters identified within the specified SOC
+    range may not adequately represent battery behavior outside that range.
+  importance: 0.8
+  selected: N/A
+- id: S3
+  classification: System Behavior
+  name: Uniform Cell Representation
+  description: The battery pack is assumed to consist of cells whose electrical characteristics
+    are sufficiently similar that the pack can be represented as a single equivalent
+    unit. In reality, individual cells may differ in capacity, state of charge, internal
+    resistance, polarization characteristics, and aging condition. These cell-to-cell
+    variations can lead to differences in the electrical response of individual cells.
+    However, in the equivalent circuit model, these variations are not explicitly
+    represented, and a common set of equivalent parameters is used to characterize
+    the battery pack as a whole. This assumption implies that the variation among
+    individual cells is sufficiently small.
+  importance: 0.4
+  selected: N/A
+- id: S4
+  classification: Data and Observation
+  name: Reliable Current Measurement
+  description: The current input used by the model is assumed to accurately represent
+    the actual battery current, and the measurement error is considered to be sufficiently
+    small for the intended application.
+  importance: 0.4
+  selected: N/A
+- id: M1
+  classification: Abstraction and Simplification
+  name: Equivalent-Circuit Representation
+  description: The complex electrochemical behavior of the battery is assumed to be
+    adequately represented by an equivalent electrical circuit.
+  importance: 0.4
+  selected: N/A
+- id: M2
+  classification: Abstraction and Simplification
+  name: Single RC Polarization Branch
+  description: The dynamic polarization behavior of the battery is represented using
+    a single RC branch. Only the dominant polarization dynamics is explicitly represented
+    by the RC branch, while additional higher-order RC branches and their associated
+    dynamic effects are neglected. This assumption implies that the first-order representation
+    is sufficient to capture the dominant transient voltage response of the battery
+    under the intended operating conditions.
+  importance: 1.0
+  selected: N/A
+- id: M3
+  classification: Mathematical Approximation
+  name: OCV–SOC Relationship
+  description: The open-circuit voltage is represented as a function of the battery's
+    state of charge, expressed as a predefined relationship VOC(SOC). In reality,
+    the open-circuit voltage can also be affected by factors such as temperature and
+    battery aging. In particular, battery aging can gradually alter the OCV–SOC relationship
+    and other electrical characteristics over the battery's lifetime, resulting in
+    parameters that vary with time or aging state. These effects are treated as negligible
+    during the considered modeling period and are not explicitly represented in the
+    model.
+  importance: 0.8
+  selected: N/A
+- id: M4
+  classification: Parameterization
+  name: Parameter Constancy
+  description: In reality, the equivalent circuit parameters R0, R1, and C1 can vary
+    as functions of the battery's operating conditions, such as SOC and temperature.
+    In the present model, these parameters are assumed to remain constant under the
+    operating conditions. This assumption implies that the variation in the operating
+    conditions is sufficiently small, and therefore the resulting changes in R0, R1,
+    and C1 can be neglected.
+  importance: 1.0
+  selected: N/A
+- id: M5
+  classification: Abstraction and Simplification
+  name: Negligible Voltage Hysteresis
+  description: The OCV is assumed to be uniquely determined by SOC and to follow the
+    same VOC(SOC) relationship during charging and discharging. In reality, the open-circuit
+    voltage at a given SOC can depend on the battery's previous charging or discharging
+    history, resulting in different voltage levels during charge and discharge at
+    the same SOC. This voltage hysteresis is not explicitly represented in the model,
+    and the difference between the charging and discharging OCV characteristics is
+    assumed to be negligible for the intended application.
+  importance: 0.6
+  selected: N/A
+- id: M6
+  classification: Resolution and Aggregation
+  name: Lumped Internal Behavior
+  description: The battery is assumed to have spatially homogeneous electrical behavior
+    such that internal spatial distributions do not need to be explicitly represented.
+    This allows the physical structure and internal behavior of the battery to be
+    represented by a single equivalent electrical circuit.
+  importance: 0.4
+  selected: N/A
+- id: C1
+  classification: Computational Tractability
+  name: Experimental Parameter Identification
+  description: The equivalent circuit parameters R0, R1, and C1 are obtained from
+    experimental measurements rather than directly derived from the underlying electrochemical
+    mechanisms. Deriving these parameters from the physical mechanisms would require
+    explicitly accounting for additional variables and potentially higher-order or
+    time-dependent relationships, resulting in a substantially more complex mathematical
+    representation. Experimentally identified parameters reduce the computational
+    complexity of parameter determination and directly provide constant parameter
+    values for the equivalent circuit under specified operating conditions.
+  importance: 0.6
+  selected: N/A
+- id: C2
+  classification: Algorithmic Approximation
+  name: Parameter Interpolation
+  description: Because the identification of experimental parameters is performed
+    only at a limited number of discrete operating points, the equivalent circuit
+    parameters at unmeasured operating conditions are obtained through interpolation.
+    The interpolation relationship is assumed to adequately represent the variation
+    of R0, R1, and C1 between the measured operating points, therefore the interpolated
+    parameters can be used to represent the battery behavior under intermediate conditions.
+  importance: 0.8
+  selected: N/A
+dependencies:
+- source: S1
+  target: M3
+  dependency_strength: 0.6
+- source: S1
+  target: M4
+  dependency_strength: 1.0
+- source: S2
+  target: M3
+  dependency_strength: 1.0
+- source: S2
+  target: M4
+  dependency_strength: 0.8
+- source: S3
+  target: M6
+  dependency_strength: 1.0
+- source: S4
+  target: C1
+  dependency_strength: 1.0
+- source: M1
+  target: M2
+  dependency_strength: 1.0
+- source: M3
+  target: M5
+  dependency_strength: 0.6
+- source: C1
+  target: M4
+  dependency_strength: 0.8
+- source: C1
+  target: C2
+  dependency_strength: 1.0

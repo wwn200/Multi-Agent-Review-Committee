@@ -157,7 +157,9 @@ class AssumptionLoader:
             "id",
             "classification",
             "name",
+            "importance",
             "description",
+            "selected"
         ]
 
         assumption_ids = set()
