@@ -68,6 +68,9 @@ class EvaluationWorkflow:
         results = []
 
         for assumption in model["assumptions"]:
+            if assumption["selected"] is not True:
+                continue
+
             evaluation_target = (
                 f"ID: {assumption['id']}\n"
                 f"Name: {assumption['name']}\n"

@@ -1,31 +1,72 @@
-assumption_set_name: cutting_stock_model
+assumption_set_name: thevenin_model
 version: '1.0'
 context:
-- The model represents a manufacturing production planning system. It is used to determine
-  production schedules and allocate products to production lines. The purpose of the
-  model is to support production planning and scheduling decisions in a manufacturing
-  environment.
+- The model is a first-order Thevenin equivalent circuit model (ECM) for representing
+  the terminal voltage response of a lithium-ion battery under a specified range of
+  operating conditions. It consists of an open-circuit voltage source VOC(SOC), an
+  ohmic resistance R0, and a single RC polarization branch with resistance R1 and
+  capacitance C1. The model uses state-of-charge dynamics dSOC/dt = -ηI/Qn, polarization-voltage
+  dynamics dV1/dt = -V1/(R1C1) + I/C1, and terminal voltage Vt = VOC(SOC) - IR0 -
+  V1. Its purpose is to approximate the battery's observable electrical behavior without
+  explicitly modeling the underlying electrochemical mechanisms.
 assumptions:
 - id: S1
   classification: Operating Conditions
-  name: Production Time Insensitivity
-  description: Products are assumed to have flexible delivery requirements, allowing
-    products from the original cutting plan to be returned to the order pool and rescheduled
-    in subsequent production batches during the replanning process. In reality, some
-    products may be associated with urgent delivery deadlines and therefore cannot
-    be postponed or returned to the order pool, limiting the flexibility of cutting
-    plan adjustments.
-- id: S2
-  classification: Operating Conditions
-  name: Simplified Production Line
-  description: The system is assumed to involve a single or simplified production
-    line; in reality, multiple heterogeneous production lines may exist simultaneously.
-- id: S3
-  classification: System Behavior
-  name: Sufficiently Large Order Pool
-  description: The order pool is assumed to be sufficiently large and fully available
-    for replanning, allowing product demands to be freely reassigned during the cutting
-    adjustment process. In reality, the set of orders available for replanning may
-    be restricted by practical considerations such as production site requirements,
-    customer-specific constraints, or other operational limitations, resulting in
-    a more limited and less flexible order pool.
+  name: Defined Operating Temperature Range
+  description: The battery is assumed to operate within a specified temperature range
+    over which the electrical model parameters are treated as constant. In reality,
+    changes in temperature can alter battery electrical characteristics, causing parameters
+    such as open-circuit voltage, ohmic resistance R0, and equivalent polarization
+    resistance and capacitance R1 and C1 to vary with temperature. Thus, treating
+    these parameters as fixed values implicitly assumes that their variation over
+    the specified temperature range is sufficiently small for the intended application.
+  importance: 0.8
+  selected: true
+- id: M1
+  classification: Abstraction and Simplification
+  name: Equivalent-Circuit Representation
+  description: The complex electrochemical behavior of the battery is assumed to be
+    adequately represented by an equivalent electrical circuit.
+  importance: 0.4
+  selected: true
+- id: M2
+  classification: Abstraction and Simplification
+  name: Single RC Polarization Branch
+  description: The dynamic polarization behavior of the battery is represented using
+    a single RC branch. Only the dominant polarization dynamics is explicitly represented
+    by the RC branch, while additional higher-order RC branches and their associated
+    dynamic effects are neglected. This assumption implies that the first-order representation
+    is sufficient to capture the dominant transient voltage response of the battery
+    under the intended operating conditions.
+  importance: 1.0
+  selected: true
+- id: M3
+  classification: Mathematical Approximation
+  name: OCV–SOC Relationship
+  description: The open-circuit voltage is represented as a function of the battery's
+    state of charge, expressed as a predefined relationship VOC(SOC). In reality,
+    the open-circuit voltage can also be affected by factors such as temperature and
+    battery aging. In particular, battery aging can gradually alter the OCV–SOC relationship
+    and other electrical characteristics over the battery's lifetime, resulting in
+    parameters that vary with time or aging state. These effects are treated as negligible
+    during the considered modeling period and are not explicitly represented in the
+    model.
+  importance: 0.8
+  selected: true
+- id: C1
+  classification: Computational Tractability
+  name: Experimental Parameter Identification
+  description: The equivalent circuit parameters R0, R1, and C1 are obtained from
+    experimental measurements rather than directly derived from the underlying electrochemical
+    mechanisms. Deriving these parameters from the physical mechanisms would require
+    explicitly accounting for additional variables and potentially higher-order or
+    time-dependent relationships, resulting in a substantially more complex mathematical
+    representation. Experimentally identified parameters reduce the computational
+    complexity of parameter determination and directly provide constant parameter
+    values for the equivalent circuit under specified operating conditions.
+  importance: 0.6
+  selected: true
+dependencies:
+- source: S1
+  target: M3
+  dependency_strength: 0.6

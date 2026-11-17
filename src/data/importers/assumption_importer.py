@@ -14,7 +14,7 @@ class AssumptionImporter:
     ------------------------
     Sheet: Assumption
 
-        ID | Classification | Assumption | Importance | Description | Selected
+        ID | Classification | Assumption | Importance | Description
 
     Sheet: Dependency
 
@@ -37,7 +37,6 @@ class AssumptionImporter:
         "Assumption",
         "Importance",
         "Description",
-        "Selected",
     ]
 
     DEPENDENCY_COLUMNS = [
@@ -325,9 +324,6 @@ class AssumptionImporter:
             importance = self._clean_weight(
                 row["Importance"], "Importance", row_number + 2
             )
-            selected = self._clean_selected(
-                row["Selected"], row_number + 2
-            )
 
             assumptions.append(
                 {
@@ -336,7 +332,7 @@ class AssumptionImporter:
                     "name": assumption_name,
                     "description": description,
                     "importance": importance,
-                    "selected": selected,
+                    "selected": "N/A",
                 }
             )
 
@@ -431,24 +427,6 @@ class AssumptionImporter:
                 f"'{field}' at Excel row {row_number} must be in [0, 1]."
             )
         return value
-
-    @staticmethod
-    def _clean_selected(value, row_number: int):
-        if isinstance(value, bool):
-            return value
-        if isinstance(value, str):
-            normalized = value.strip().lower()
-            if not normalized:
-                return "N/A"
-            if normalized == "true":
-                return True
-            if normalized == "false":
-                return False
-            if normalized == "n/a":
-                return "N/A"
-        raise ValueError(
-            f"'Selected' at Excel row {row_number} must be True, False, or N/A."
-        )
 
     def _validate_assumption_set(
         self,

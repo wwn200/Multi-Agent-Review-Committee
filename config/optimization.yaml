@@ -1,0 +1,8 @@
+# Maximum questionnaire burden.
+Q_max: 100
+
+# Fixed burden per selected assumption.
+a: 6
+
+# Weight of subjective importance versus dependency influence.
+alpha: 0.75

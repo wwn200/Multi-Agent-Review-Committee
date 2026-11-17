@@ -73,6 +73,20 @@ def main():
     )
 
     # --------------------------------------------------
+    # update-assumption-set command
+    # --------------------------------------------------
+
+    update_assumption_parser = subparsers.add_parser(
+        "update-assumption-set",
+        help="Optimize selection of assumption set.",
+    )
+
+    update_assumption_parser.add_argument(
+        "model_name",
+        help="Name of the model.",
+    )
+
+    # --------------------------------------------------
     # import-result command
     # --------------------------------------------------
 
@@ -170,6 +184,26 @@ def main():
         print(loader.list_assumptions())
         print(loader.load(args.model_name))
 
+    if args.command == "update-assumption-set":
+        loader = AssumptionLoader()
+        try:
+            assumption_set = loader.load(
+                args.model_name,
+                force_optimization=True,
+            )
+        except (FileNotFoundError, ValueError, RuntimeError) as exc:
+            parser.error(str(exc))
+
+        selected_count = sum(
+            assumption["selected"] is True
+            for assumption in assumption_set["assumptions"]
+        )
+        print(
+            f"Updated assumption set '{args.model_name}'. "
+            f"Selected {selected_count}/"
+            f"{len(assumption_set['assumptions'])} assumptions."
+        )
+
     if args.command == "import-result":
 
         try:
@@ -245,3 +279,4 @@ if __name__ == "__main__":
 #python main.py import-rubric test_rubric   
 #python main.py evaluate-model test_committee cutting_stock_model test_rubric
 #python main.py visualize-result min_model_test_rubric_test_committee
+#python main.py update-assumption-set thevenin_model

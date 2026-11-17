@@ -5,6 +5,7 @@ pandas
 openpyxl
 matplotlib
 PyYAML
+gurobipy
 
 # Test dependencies
 pytest
