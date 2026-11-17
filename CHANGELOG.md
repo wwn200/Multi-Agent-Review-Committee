@@ -1,12 +1,12 @@
 All notable changes to this project will be documented in this file.
 
-## [1.3.0] - 2026-10-
+## [1.3.0] - 2026-11-17
 
 ### Changed
-- Updated the structure of input assumption Excel support given assumption Importance and dependency between assumptions.
+- Updated the structure of input assumption Excel support given assumption Importance and dependency strength between assumptions.
 
 ### Added
-- Added a optimization model for assumption set construction.
+- Added a optimization model for assumption set selection.
 - Added the `update-assumption-set` CLI command to independently run assumption selection optimization and update the selected assumption set by adjusting optimization parameters as evaluation requirements change.
 - Integrated assumption selection optimization into the assumption set loading process through the `_resolve_selection()` function in `assumption_loader.py`. This means that when loading a new assumption set, the selection optimization is automatically performed based on the configured optimization parameters. During normal workflow execution, optimization is automatically skipped for assumption sets where all assumptions have already been assigned a valid selected value (i.e., none are N/A), avoiding unnecessary re-optimization.
 
