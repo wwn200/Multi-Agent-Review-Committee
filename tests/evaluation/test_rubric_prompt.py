@@ -22,36 +22,12 @@ def test_build_rubric_prompt():
     assert "## Evaluation Rubric" in rubric_prompt
     assert "### General Guidance" in rubric_prompt
 
-    # Check evaluation types
-    assert "### Potential Impact" in rubric_prompt
-    assert "### Fidelity" in rubric_prompt
-
-    # Check attributes
-    assert "#### Importance" in rubric_prompt
-    assert "#### Risk" in rubric_prompt
-    assert "#### Usability" in rubric_prompt
-
-    assert "#### Confidence" in rubric_prompt
-    assert "#### Evidence" in rubric_prompt
-    assert "#### Robustness" in rubric_prompt
-
-    # Check questions
-    assert (
-        "How important is assumption A for the validity of the model?"
-        in rubric_prompt
-    )
-
-    assert (
-        "How confident are you that assumption A reflects reality?"
-        in rubric_prompt
-    )
-
-    # Check score descriptions
-    assert "1: Not important" in rubric_prompt
-    assert "5: Extremely important" in rubric_prompt
-
-    assert "1: Not confident" in rubric_prompt
-    assert "5: Extremely confident" in rubric_prompt
+    for criterion in rubric["criteria"]:
+        assert f"### {criterion['type']}" in rubric_prompt
+        assert f"#### {criterion['attribute']}" in rubric_prompt
+        assert f"Question: {criterion['question']}" in rubric_prompt
+        for score, description in criterion["scores"].items():
+            assert f"- {score}: {description}" in rubric_prompt
 
     print("\n=== Generated Rubric Prompt ===")
     print(rubric_prompt)

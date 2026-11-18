@@ -60,6 +60,16 @@ class EvaluationWorkflow:
         task_template = self.task_template_loader.load()
 
         self.rubric_validator.validate(rubric)
+        attributes_by_type = {}
+        for criterion in rubric["criteria"]:
+            attributes = attributes_by_type.setdefault(criterion["type"], [])
+            if criterion["attribute"] not in attributes:
+                attributes.append(criterion["attribute"])
+        evaluation_types = ", ".join(attributes_by_type)
+        evaluation_attributes = "; ".join(
+            f"{evaluation_type}: {', '.join(attributes)}"
+            for evaluation_type, attributes in attributes_by_type.items()
+        )
 
         # Step 3: Build the evaluator committee
         agents = self._build_committee(config)
@@ -78,6 +88,8 @@ class EvaluationWorkflow:
             )
             task = task_template.format(
                 evaluation_target=evaluation_target,
+                evaluation_types=evaluation_types,
+                evaluation_attributes=evaluation_attributes,
             )
             assumption_id = assumption['id']
 

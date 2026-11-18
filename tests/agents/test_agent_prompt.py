@@ -2,6 +2,7 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 from src.agents.committee import EvaluatorAgentCommittee
+from src.data.loaders.rubric_loader import RubricLoader
 from src.llm.client import LLMClient
 
 
@@ -34,14 +35,7 @@ def test_create_manufacturing_product_manager_prompt():
         evaluator_id="product_manager_001",
     )
 
-    # A simple rubric for testing prompt generation
-    rubric = """
-Evaluate the assumption based on:
-1. Potential Impact: How important is this assumption to the validity
-   of the model?
-2. Fidelity: How realistically does the assumption represent the
-   real-world system?
-"""
+    rubric = RubricLoader().load("test_rubric")
 
     # Generate the system prompt
     system_prompt = agent.prepare_system_prompt(rubric)
@@ -63,9 +57,10 @@ Evaluate the assumption based on:
     assert "machine capacity" in system_prompt
     assert "material waste" in system_prompt
 
-    # Check that evaluation rubric is included
-    assert "Potential Impact" in system_prompt
-    assert "Fidelity" in system_prompt
+    # Check that the selected rubric's types and attributes are included.
+    for criterion in rubric["criteria"]:
+        assert criterion["type"] in system_prompt
+        assert criterion["attribute"] in system_prompt
 
     print("\n=== Evaluator Profile ===")
     print(agent.profile)

@@ -3,9 +3,7 @@ template: |
 
   {evaluation_target}
 
-  Assess both the potential impact and fidelity of this assumption.
-  Consider the assumption from the perspective of your role, knowledge and background.
-
-  Provide the scores for Potential Impact and Fidelity, as well as the scores for their respective attributes.
+  Assess this assumption against each evaluation type in the selected rubric: {evaluation_types}, and its corresponding attributes: {evaluation_attributes}.
+  Provide scores for each evaluation type and its attributes as specified in the rubric.
 
   Provide a concise rationale explaining your scores.

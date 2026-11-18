@@ -147,7 +147,7 @@ class WorkflowConfigLoader:
 
 
 class TaskTemplateLoader:
-    """Load the fixed evaluation task template from YAML."""
+    """Load the evaluation task template from YAML."""
 
     def __init__(self, project_root: Path | None = None):
         if project_root is None:
@@ -170,9 +170,18 @@ class TaskTemplateLoader:
             )
 
         template = data["template"].strip()
-        if "{evaluation_target}" not in template:
+        required_placeholders = (
+            "{evaluation_target}",
+            "{evaluation_types}",
+            "{evaluation_attributes}",
+        )
+        if any(
+            placeholder not in template
+            for placeholder in required_placeholders
+        ):
             raise ValueError(
-                "Task template must contain '{evaluation_target}'."
+                "Task template must contain '{evaluation_target}', "
+                "'{evaluation_types}', and '{evaluation_attributes}'."
             )
 
         return template

@@ -13,35 +13,10 @@ from src.data.importers.result_importer import EvaluationResultLoader
 class EvaluationVisualizer:
     """Create visualizations from multi-agent evaluation results."""
 
-    POTENTIAL_IMPACT_COLUMN = "potential_impact-score"
-    FIDELITY_COLUMN = "fidelity-score"
     ASSUMPTION_COLUMN = "assumption_id"
-    IMPORTANCE_COLUMN = "potential_impact-importance"
-    RISK_COLUMN = "potential_impact-risk"
-    USABILITY_COLUMN = "potential_impact-usability"
-    CONFIDENCE_COLUMN = "fidelity-confidence"
-    EVIDENCE_COLUMN = "fidelity-evidence"
-    ROBUSTNESS_COLUMN = "fidelity-robustness"
-
-    ASSESSMENT_DIMENSIONS = {
-        "Potential Impact": POTENTIAL_IMPACT_COLUMN,
-        "Fidelity": FIDELITY_COLUMN,
-    }
-    ASSESSMENT_ATTRIBUTES = {
-        "Importance": IMPORTANCE_COLUMN,
-        "Risk": RISK_COLUMN,
-        "Usability": USABILITY_COLUMN,
-        "Confidence": CONFIDENCE_COLUMN,
-        "Evidence": EVIDENCE_COLUMN,
-        "Robustness": ROBUSTNESS_COLUMN,
-    }
-
-    ASSUMPTION_ASSESSMENT_SCATTER_FILENAME = (
-        "potential_impact_vs_fidelity"
-    )
-    ASSUMPTION_ASSESSMENT_HEATMAP_FILENAME = (
-    "assumption_assessment_heatmap"
-)
+    SCORE_SUFFIX = "-score"
+    ASSUMPTION_ASSESSMENT_SCATTER_FILENAME = "assessment_scores_by_assumption"
+    ASSUMPTION_ASSESSMENT_HEATMAP_FILENAME = "assessment_dimension_heatmap"
     AGENT_ROLE_SCORE_FILENAME = "agent_role_score_comparison"
 
     def __init__(
@@ -55,22 +30,57 @@ class EvaluationVisualizer:
         """Load evaluation results using ``EvaluationResultLoader``."""
         return self.loader.load(result_file)
 
+    @classmethod
+    def _dimension_score_columns(cls, df: pd.DataFrame) -> list[str]:
+        """Find aggregate evaluation-type score columns in result data."""
+        return [
+            column
+            for column in df.columns
+            if isinstance(column, str) and column.endswith(cls.SCORE_SUFFIX)
+        ]
+
+    @classmethod
+    def _attribute_score_columns(
+        cls,
+        df: pd.DataFrame,
+        dimension_columns: list[str],
+    ) -> list[tuple[str, str]]:
+        """Return attribute labels and columns grouped under rubric types."""
+        attributes = []
+        for dimension_column in dimension_columns:
+            type_key = dimension_column[: -len(cls.SCORE_SUFFIX)]
+            prefix = f"{type_key}-"
+            for column in df.columns:
+                if (
+                    isinstance(column, str)
+                    and column.startswith(prefix)
+                    and column != dimension_column
+                ):
+                    attribute = column[len(prefix) :]
+                    attributes.append((attribute.replace("_", " ").title(), column))
+        return attributes
+
+    @classmethod
+    def _dimension_label(cls, column: str) -> str:
+        """Convert a normalized result column into a readable type label."""
+        return column[: -len(cls.SCORE_SUFFIX)].replace("_", " ").title()
+
     def aggregate_by_assumption(
         self,
         df: pd.DataFrame,
         method: str = "mean",
     ) -> pd.DataFrame:
         """Aggregate evaluator scores into one row per assumption."""
-        required_columns = {
-            self.ASSUMPTION_COLUMN,
-            self.POTENTIAL_IMPACT_COLUMN,
-            self.FIDELITY_COLUMN,
-        }
-        missing_columns = required_columns - set(df.columns)
-        if missing_columns:
+        if self.ASSUMPTION_COLUMN not in df.columns:
             raise ValueError(
-                "Missing required columns: "
-                f"{sorted(missing_columns)}"
+                f"Missing required column: {self.ASSUMPTION_COLUMN}"
+            )
+
+        score_columns = self._dimension_score_columns(df)
+        if not score_columns:
+            raise ValueError(
+                "No evaluation-type score columns found; expected columns "
+                f"ending in '{self.SCORE_SUFFIX}'."
             )
 
         if method not in {"mean", "median"}:
@@ -79,10 +89,6 @@ class EvaluationVisualizer:
                 "Use 'mean' or 'median'."
             )
 
-        score_columns = [
-            self.POTENTIAL_IMPACT_COLUMN,
-            self.FIDELITY_COLUMN,
-        ]
         return (
             df.groupby(self.ASSUMPTION_COLUMN, as_index=False)[score_columns]
             .agg(method)
@@ -95,33 +101,56 @@ class EvaluationVisualizer:
         figsize: tuple[float, float] = (10, 7),
         show: bool = True,
     ) -> Figure:
-        """Plot aggregated Potential Impact against Fidelity by assumption."""
-
-        fig, ax = plt.subplots(figsize=figsize)
-
-        ax.scatter(
-            df[self.FIDELITY_COLUMN],
-            df[self.POTENTIAL_IMPACT_COLUMN],
-            s=100,
-        )
-
-        for _, row in df.iterrows():
-            ax.annotate(
-                str(row[self.ASSUMPTION_COLUMN]),
-                (
-                    row[self.FIDELITY_COLUMN],
-                    row[self.POTENTIAL_IMPACT_COLUMN],
-                ),
-                xytext=(8, 5),
-                textcoords="offset points",
+        """Compare aggregated evaluation-type scores for each assumption."""
+        dimension_columns = self._dimension_score_columns(df)
+        if not dimension_columns:
+            raise ValueError("No evaluation-type score columns found.")
+        if self.ASSUMPTION_COLUMN not in df.columns:
+            raise ValueError(
+                f"Missing required column: {self.ASSUMPTION_COLUMN}"
             )
 
-        ax.axvline(threshold, linestyle="--", linewidth=1.5)
+        fig, ax = plt.subplots(figsize=figsize)
+        if len(dimension_columns) == 2:
+            x_column, y_column = dimension_columns
+            ax.scatter(
+                df[x_column],
+                df[y_column],
+                s=100,
+            )
+            for _, row in df.iterrows():
+                ax.annotate(
+                    str(row[self.ASSUMPTION_COLUMN]),
+                    (row[x_column], row[y_column]),
+                    xytext=(8, 5),
+                    textcoords="offset points",
+                )
+
+            ax.axvline(threshold, linestyle="--", linewidth=1.5)
+            ax.set_xlabel(f"{self._dimension_label(x_column)} Score")
+            ax.set_ylabel(f"{self._dimension_label(y_column)} Score")
+            ax.set_xlim(1, 5)
+        else:
+            positions = np.arange(len(df))
+            offset_width = 0.8 / len(dimension_columns)
+
+            for index, column in enumerate(dimension_columns):
+                offset = (index - (len(dimension_columns) - 1) / 2) * offset_width
+                ax.scatter(
+                    positions + offset,
+                    df[column],
+                    s=70,
+                    label=self._dimension_label(column),
+                )
+
+            ax.set_xticks(positions)
+            ax.set_xticklabels(df[self.ASSUMPTION_COLUMN].astype(str))
+            ax.set_xlabel("Assumption")
+            ax.set_ylabel("Evaluation Score")
+            ax.legend(title="Evaluation Type")
+
         ax.axhline(threshold, linestyle="--", linewidth=1.5)
-        ax.set_xlabel("Fidelity Score")
-        ax.set_ylabel("Potential Impact Score")
         ax.set_title(self.ASSUMPTION_ASSESSMENT_SCATTER_FILENAME)
-        ax.set_xlim(1, 5)
         ax.set_ylim(1, 5)
         ax.grid(True, alpha=0.3)
         fig.tight_layout()
@@ -137,22 +166,19 @@ class EvaluationVisualizer:
         figsize: tuple[float, float] = (8, 6),
         show: bool = True,
     ) -> Figure:
-        """Plot aggregated Potential Impact and Fidelity scores as a heatmap."""
-        
-        heatmap_data = (
-            df.set_index(self.ASSUMPTION_COLUMN)[
-                [
-                    self.POTENTIAL_IMPACT_COLUMN,
-                    self.FIDELITY_COLUMN,
-                ]
-            ]
-            .rename(
-                columns={
-                    self.POTENTIAL_IMPACT_COLUMN: "Potential Impact",
-                    self.FIDELITY_COLUMN: "Fidelity",
-                }
+        """Plot aggregated scores for every rubric type as a heatmap."""
+        dimension_columns = self._dimension_score_columns(df)
+        if not dimension_columns:
+            raise ValueError("No evaluation-type score columns found.")
+        if self.ASSUMPTION_COLUMN not in df.columns:
+            raise ValueError(
+                f"Missing required column: {self.ASSUMPTION_COLUMN}"
             )
-        )
+
+        heatmap_data = df.set_index(self.ASSUMPTION_COLUMN)[dimension_columns]
+        heatmap_data.columns = [
+            self._dimension_label(column) for column in dimension_columns
+        ]
 
         fig, ax = plt.subplots(figsize=figsize)
 
@@ -180,7 +206,7 @@ class EvaluationVisualizer:
                     va="center",
                 )
 
-        ax.set_xlabel("Assessment Dimension")
+        ax.set_xlabel("Evaluation Type")
         ax.set_ylabel("Assumption")
         ax.set_title(self.ASSUMPTION_ASSESSMENT_HEATMAP_FILENAME)
 
@@ -339,10 +365,8 @@ class EvaluationVisualizer:
     ) -> Figure:
         """Plot mean assessment dimension scores grouped by evaluator role."""
 
-        required_columns = {
-            "evaluator_id",
-            *self.ASSESSMENT_DIMENSIONS.values(),
-        }
+        dimension_columns = self._dimension_score_columns(df)
+        required_columns = {"evaluator_id", *dimension_columns}
         missing_columns = required_columns - set(df.columns)
 
         if missing_columns:
@@ -350,6 +374,8 @@ class EvaluationVisualizer:
                 "Missing required columns: "
                 f"{sorted(missing_columns)}"
             )
+        if not dimension_columns:
+            raise ValueError("No evaluation-type score columns found.")
 
         role_scores = df.copy()
         role_scores["evaluator_role"] = role_scores["evaluator_id"].astype(str).str.replace(
@@ -358,13 +384,14 @@ class EvaluationVisualizer:
             regex=True,
         )
         grouped_scores = role_scores.groupby("evaluator_role", sort=False)[
-            list(self.ASSESSMENT_DIMENSIONS.values())
+            dimension_columns
         ].mean()
 
         roles = grouped_scores.index.tolist()
-        dimensions = list(self.ASSESSMENT_DIMENSIONS.items())
-        dimension_names = [dimension_name for dimension_name, _ in dimensions]
-        positions = np.arange(len(dimensions))
+        dimension_names = [
+            self._dimension_label(column) for column in dimension_columns
+        ]
+        positions = np.arange(len(dimension_columns))
         width = 0.8 / len(roles)
 
         fig, ax = plt.subplots(figsize=figsize)
@@ -373,14 +400,14 @@ class EvaluationVisualizer:
             offset = (index - (len(roles) - 1) / 2) * width
             bars = ax.bar(
                 positions + offset,
-                [grouped_scores.loc[role, score_column] for _, score_column in dimensions],
+                [grouped_scores.loc[role, column] for column in dimension_columns],
                 width=width,
                 label=role,
             )
 
             ax.bar_label(bars, fmt="%.2f", padding=3)
 
-        ax.set_xlabel("Assessment Dimension")
+        ax.set_xlabel("Evaluation Type")
         ax.set_ylabel("Mean Score")
         ax.set_title("Assessment Scores by Evaluator Role")
         ax.set_xticks(positions)
@@ -417,12 +444,17 @@ class EvaluationVisualizer:
             df,
             method=aggregation,
         )
+        dimension_columns = self._dimension_score_columns(df)
+        attribute_columns = self._attribute_score_columns(
+            df,
+            dimension_columns,
+        )
 
         output_paths = {}
 
-        # Scatter plot
+        # Compare all evaluation types across assumptions.
         scatter_path = result_path.parent / f"{self.ASSUMPTION_ASSESSMENT_SCATTER_FILENAME}.png"
-        output_paths["potential_impact_vs_fidelity"] = scatter_path
+        output_paths[self.ASSUMPTION_ASSESSMENT_SCATTER_FILENAME] = scatter_path
 
         figure1 = self.plot_assumption_assessment_scatter(
             aggregated,
@@ -451,14 +483,10 @@ class EvaluationVisualizer:
             bbox_inches="tight",
         )
 
-        # Agent score distributions for assessment dimensions
-        for dimension_name, score_column in self.ASSESSMENT_DIMENSIONS.items():
-
-            filename = (
-                dimension_name.lower()
-                .replace(" ", "_")
-                + "_score_distribution.png"
-            )
+        # Agent score distributions for evaluation types.
+        for score_column in dimension_columns:
+            dimension_name = self._dimension_label(score_column)
+            filename = f"{score_column[:-len(self.SCORE_SUFFIX)]}_score_distribution.png"
 
             distribution_path = result_path.parent / filename
 
@@ -476,17 +504,11 @@ class EvaluationVisualizer:
                 bbox_inches="tight",
             )
 
-            output_paths[
-                f"{dimension_name.lower().replace(' ', '_')}_score_distribution"
-            ] = distribution_path
+            output_paths[filename.removesuffix(".png")] = distribution_path
 
-        # Agent score frequencies for assessment attributes
-        for attribute_name, score_column in self.ASSESSMENT_ATTRIBUTES.items():
-            filename = (
-                attribute_name.lower()
-                .replace(" ", "_")
-                + "_score_distribution.png"
-            )
+        # Agent score frequencies for rubric attributes.
+        for attribute_name, score_column in attribute_columns:
+            filename = f"{score_column.replace('-', '_')}_score_distribution.png"
 
             distribution_path = result_path.parent / filename
 
@@ -504,9 +526,7 @@ class EvaluationVisualizer:
                 bbox_inches="tight",
             )
 
-            output_paths[
-                f"{attribute_name.lower().replace(' ', '_')}_score_distribution"
-            ] = distribution_path
+            output_paths[filename.removesuffix(".png")] = distribution_path
 
         # Assessment scores grouped by evaluator role
         role_score_path = (

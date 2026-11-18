@@ -9,8 +9,8 @@ def test_save_creates_run_directory_and_standard_filename(tmp_path):
         assumption_id="A1",
         evaluator_id="evaluator-1",
         response={
-            "potential_impact": {"score": 4},
-            "fidelity": {"score": 3},
+            "system_quality": {"score": 4, "reliability": 3},
+            "traceability": {"score": 3, "auditability": 5},
             "rationale": "rationale",
         },
     )
@@ -30,13 +30,20 @@ def test_save_creates_run_directory_and_standard_filename(tmp_path):
     )
     assert output_path == expected_path
     assert output_path.exists()
+    result_data = EvaluationResultLoader(output_dir=tmp_path).load(output_path)
+    assert {
+        "system_quality-score",
+        "system_quality-reliability",
+        "traceability-score",
+        "traceability-auditability",
+    }.issubset(result_data.columns)
 
 
 def test_loader_resolves_run_name_and_lists_runs(tmp_path):
     result = SimpleNamespace(
         assumption_id="A1",
         evaluator_id="evaluator-1",
-        response={"potential_impact": {"score": 4}},
+        response={"service_resilience": {"score": 4}},
     )
     EvaluationResultWriter(output_dir=tmp_path).save(
         [result],

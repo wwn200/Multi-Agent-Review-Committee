@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 from src.data.loaders.assumption_loader import AssumptionLoader
 from src.workflow.config import WorkflowConfigLoader
 from src.workflow.workflow import EvaluationWorkflow
@@ -57,3 +59,69 @@ def test_workflow_evaluates_each_assumption_with_each_committee_member():
 
     print("\n=== Assumption C2 Last Agent Evaluation Result ===")
     print(results[-1].response)
+
+
+def test_workflow_uses_types_from_selected_rubric_in_task(monkeypatch):
+    workflow = EvaluationWorkflow(FakeLLMClient())
+    rubric = {
+        "scale": {"min": 1, "max": 5},
+        "criteria": [
+            {
+                "type": "System Stability",
+                "attribute": "Failure Resistance",
+                "scores": {1: "low"},
+            },
+            {
+                "type": "Verification Traceability",
+                "attribute": "Auditability",
+                "scores": {1: "low"},
+            },
+            {
+                "type": "System Stability",
+                "attribute": "Recovery Time",
+                "scores": {1: "low"},
+            },
+        ],
+    }
+    model = {
+        "context": [],
+        "assumptions": [
+            {
+                "id": "A1",
+                "name": "Test assumption",
+                "description": "A test description.",
+                "selected": True,
+            }
+        ],
+    }
+    tasks = []
+
+    monkeypatch.setattr(
+        workflow.config_loader,
+        "load",
+        lambda **kwargs: SimpleNamespace(
+            rubric="custom_rubric",
+            model="test_model",
+        ),
+    )
+    monkeypatch.setattr(workflow.rubric_loader, "load", lambda name: rubric)
+    monkeypatch.setattr(workflow.model_loader, "load", lambda name: model)
+    monkeypatch.setattr(workflow, "_build_committee", lambda config: [])
+    monkeypatch.setattr(
+        workflow.executor,
+        "run",
+        lambda **kwargs: tasks.append(kwargs["task"]) or [],
+    )
+
+    workflow.run(
+        committee_config="test_committee",
+        rubric_name="custom_rubric",
+        model_name="test_model",
+    )
+
+    assert len(tasks) == 1
+    assert "System Stability, Verification Traceability" in tasks[0]
+    assert (
+        "System Stability: Failure Resistance, Recovery Time; "
+        "Verification Traceability: Auditability"
+    ) in tasks[0]

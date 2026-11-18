@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [1.3.1] - 2026-11-
+
+### Changed
+- Remove the hard-coded evaluation type name in `task_template.yaml`.
+- Remove the hard-coded evaluation type name in workflow(including `config.py` and `workflow.py`) to support reading evaluation type name form config when constructing task prompt.
+- Remove the hard-coded evaluation type name in `evaluation_visualizer.py`.(Only generate the Key Assumptions Identification plot (the original Potential Impact vs. Fidelity scatter plot) when the rubric contains exactly two evaluation types.)
+- Remove the hard-coded evaluation type name in test file.
+
 ## [1.3.0] - 2026-11-17
 
 ### Changed

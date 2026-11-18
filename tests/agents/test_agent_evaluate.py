@@ -98,10 +98,8 @@ Evaluate the following model assumption:
 
 "The equipment failure rate remains stable over the planning horizon."
 
-Assess both the potential impact and fidelity of this assumption.
+Assess the assumption using every evaluation type and attribute in the rubric.
 Consider the assumption from the perspective of your role, knowledge and background.
-
-Provide the scores for Potential Impact and Fidelity, as well as the scores for their respective attributes.
 
 Provide a concise rationale explaining your scores.
 """
